@@ -8,9 +8,9 @@
 # and `allowUserKeys: false` removes the "add a provider / connect a token
 # plan" surfaces. The browser still shows the course model map, read-only.
 #
-# This template exercises chat and course generation only. Add the optional
-# providers and slots you have keys for (image, video, tts, webSearch) before
-# `lock: all` turns the rest off.
+# This template exercises chat, course generation and optional narration.
+# Add the optional providers and slots you have keys for (image, video, tts,
+# webSearch) before `lock: all` turns the rest off.
 # =============================================================================
 
 providers:
@@ -20,11 +20,21 @@ providers:
     models: [gpt-5.5]
     # baseUrl: ${OPENAI_BASE_URL}   # an OpenAI-compatible gateway
 
+  # Optional narration. The DeepSeek Token Plan carries TTS on the same key and
+  # endpoint; it has no model id, and the default voice is `stella`.
+  # Other providers use their own preset (openai-tts, minimax-tts, azure-tts,
+  # qwen-tts, ...; see packages/docs/content/docs/supported-models.mdx).
+  # deepseek-tts:
+  #   preset: deepseek-tts
+  #   apiKey: ${OPENAI_API_KEY}
+  #   baseUrl: ${OPENAI_BASE_URL}
+
 slots:
   llm: openai:gpt-5.5
   course.outline: openai:gpt-5.5
   course.content: openai:gpt-5.5
   agent: openai:gpt-5.5
+  # tts: deepseek-tts
 
 # Every slot is fixed by the administrator, with its whole subtree.
 lock: all
