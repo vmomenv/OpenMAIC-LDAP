@@ -11,6 +11,7 @@ const TTL = 3600;
 const CONFIG: LdapConfig = {
   url: 'ldap://localhost:389',
   startTLS: false,
+  allowInsecure: false,
   bindDn: null,
   bindPassword: null,
   searchBase: 'ou=people,dc=example,dc=com',
