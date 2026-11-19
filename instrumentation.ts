@@ -304,6 +304,12 @@ async function validateBootConfiguration(): Promise<void> {
   if (ldapEnabled()) {
     runConfigurationCheck(validateLdapConfiguration);
     const config = readLdapConfig();
+    if (config.allowInsecure && !config.startTLS && config.url.startsWith('ldap:')) {
+      console.warn(
+        '[ldap] LDAP_ALLOW_INSECURE=true: directory binds travel over plain ldap:// without TLS. ' +
+          'Only use this on a network you already trust; passwords are not encrypted on that hop.',
+      );
+    }
     const { createLdapAuthMethod } = await import('@/lib/server/identity/ldap/auth-method');
     const { configureOwnerAuthentication } = await import('@/lib/server/identity');
     runConfigurationCheck(() =>

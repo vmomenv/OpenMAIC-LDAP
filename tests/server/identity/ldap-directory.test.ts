@@ -11,6 +11,7 @@ import type { LdapConfig } from '@/lib/server/identity/ldap/config';
 const CONFIG: LdapConfig = {
   url: 'ldap://localhost:389',
   startTLS: false,
+  allowInsecure: false,
   bindDn: null,
   bindPassword: null,
   searchBase: 'ou=people,dc=example,dc=com',
@@ -98,6 +99,16 @@ describe('authenticateLdapUser', () => {
       CONFIG.searchBase,
       expect.objectContaining({ filter: '(&(objectClass=person)(uid=a\\2alice))' }),
     );
+  });
+
+  it('strips a domain prefix from a DOMAIN\\user login', async () => {
+    const client = fakeClient();
+    await authenticateLdapUser({ username: 'EXAMPLE\\alice', password: 'correct' }, deps(client));
+    expect(client.search).toHaveBeenCalledWith(
+      CONFIG.searchBase,
+      expect.objectContaining({ filter: '(&(objectClass=person)(uid=alice))' }),
+    );
+    expect(client.bind).toHaveBeenCalledWith('uid=alice,ou=people,dc=example,dc=com', 'correct');
   });
 
   it('refuses an empty password without contacting the directory', async () => {

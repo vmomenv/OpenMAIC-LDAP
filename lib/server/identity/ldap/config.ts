@@ -20,6 +20,12 @@ export interface LdapConfig {
   url: string;
   /** Upgrade a plain `ldap://` connection with StartTLS before authenticating. */
   startTLS: boolean;
+  /**
+   * Whether a plain `ldap://` connection without StartTLS is accepted. Only
+   * for a directory that cannot offer either, on a network the operator
+   * already trusts: the user's password crosses that hop in clear text.
+   */
+  allowInsecure: boolean;
   /** Read-only account used to find the user entry; null for anonymous search. */
   bindDn: string | null;
   bindPassword: string | null;
@@ -122,9 +128,10 @@ export function readLdapConfig(env: LdapEnvironment = process.env): LdapConfig {
   }
 
   const startTLS = flag(env, 'LDAP_STARTTLS', false);
-  if (parsed.protocol === 'ldap:' && !startTLS) {
+  const allowInsecure = flag(env, 'LDAP_ALLOW_INSECURE', false);
+  if (parsed.protocol === 'ldap:' && !startTLS && !allowInsecure) {
     throw new LdapConfigError(
-      'LDAP_URL uses plain ldap:// without transport security. Set LDAP_STARTTLS=true, or use ldaps://.',
+      'LDAP_URL uses plain ldap:// without transport security. Set LDAP_STARTTLS=true, use ldaps://, or accept the risk explicitly with LDAP_ALLOW_INSECURE=true.',
     );
   }
   if (parsed.protocol === 'ldaps:' && startTLS) {
@@ -164,6 +171,7 @@ export function readLdapConfig(env: LdapEnvironment = process.env): LdapConfig {
   return {
     url,
     startTLS,
+    allowInsecure,
     bindDn,
     bindPassword,
     searchBase,

@@ -51,6 +51,15 @@ describe('readLdapConfig', () => {
     );
   });
 
+  it('allows plain ldap:// only when the operator explicitly accepts it', () => {
+    const config = readLdapConfig({
+      ...BASE_ENV,
+      LDAP_URL: 'ldap://ldap.example.com:389',
+      LDAP_ALLOW_INSECURE: 'true',
+    });
+    expect(config.allowInsecure).toBe(true);
+  });
+
   it('rejects StartTLS on ldaps://', () => {
     expect(() => readLdapConfig({ ...BASE_ENV, LDAP_STARTTLS: 'true' })).toThrow(/StartTLS/);
   });

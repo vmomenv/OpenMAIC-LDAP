@@ -151,7 +151,10 @@ function validateInput(input: { username: string; password: string }): {
   username: string;
   password: string;
 } {
-  const username = input.username.trim();
+  const raw = input.username.trim();
+  // Windows domains are often typed as DOMAIN\user; the directory search
+  // matches the account name itself.
+  const username = raw.includes('\\') ? raw.slice(raw.lastIndexOf('\\') + 1).trim() : raw;
   if (
     username.length === 0 ||
     username.length > 256 ||
