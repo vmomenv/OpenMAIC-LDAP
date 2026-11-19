@@ -111,6 +111,24 @@ describe('authenticateLdapUser', () => {
     expect(client.bind).toHaveBeenCalledWith('uid=alice,ou=people,dc=example,dc=com', 'correct');
   });
 
+  it('replaces every placeholder in the filter', async () => {
+    const client = fakeClient();
+    await authenticateLdapUser(
+      { username: 'alice', password: 'correct' },
+      deps(client, {
+        ...CONFIG,
+        userFilter:
+          '(&(objectClass=person)(|(sAMAccountName={username})(userPrincipalName={username})))',
+      }),
+    );
+    expect(client.search).toHaveBeenCalledWith(
+      CONFIG.searchBase,
+      expect.objectContaining({
+        filter: '(&(objectClass=person)(|(sAMAccountName=alice)(userPrincipalName=alice)))',
+      }),
+    );
+  });
+
   it('refuses an empty password without contacting the directory', async () => {
     const createClient = vi.fn();
     await expect(

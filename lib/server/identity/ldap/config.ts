@@ -147,11 +147,6 @@ export function readLdapConfig(env: LdapEnvironment = process.env): LdapConfig {
       'LDAP_USER_FILTER must contain the {username} placeholder, for example (uid={username}).',
     );
   }
-  if (userFilter.split('{username}').length !== 2) {
-    throw new LdapConfigError(
-      'LDAP_USER_FILTER must contain the {username} placeholder exactly once.',
-    );
-  }
 
   const bindDn = optional(env, 'LDAP_BIND_DN');
   const bindPassword = optional(env, 'LDAP_BIND_PASSWORD');

@@ -45,6 +45,15 @@ describe('readLdapConfig', () => {
     );
   });
 
+  it('accepts the placeholder more than once', () => {
+    const config = readLdapConfig({
+      ...BASE_ENV,
+      LDAP_USER_FILTER:
+        '(&(objectClass=person)(|(sAMAccountName={username})(userPrincipalName={username})))',
+    });
+    expect(config.userFilter).toContain('{username}');
+  });
+
   it('rejects a plain ldap:// URL without StartTLS', () => {
     expect(() => readLdapConfig({ ...BASE_ENV, LDAP_URL: 'ldap://ldap.example.com:389' })).toThrow(
       /LDAP_STARTTLS/,

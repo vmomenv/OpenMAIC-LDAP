@@ -218,7 +218,7 @@ export async function authenticateLdapUser(
       }
     }
 
-    const filter = config.userFilter.replace('{username}', escapeLdapFilterValue(username));
+    const filter = config.userFilter.replaceAll('{username}', escapeLdapFilterValue(username));
     let entries: LdapSearchEntry[];
     try {
       const result = await client.search(config.searchBase, {
