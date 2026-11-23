@@ -11,6 +11,10 @@
 </p>
 
 <p align="center">
+  <b>LDAP 多租户版</b> — 启动前必须填写 <code>.env.local</code> 中的 <code>LDAP_*</code> 配置。<a href="#-ldap-多租户版">配置说明</a>
+</p>
+
+<p align="center">
   <a href="https://my.feishu.cn/wiki/UIfKw9Knti0LcKkTxDNcqlUrnzh"><img src="https://img.shields.io/badge/%F0%9F%93%99%20%E4%BD%93%E9%AA%8C%E6%8C%87%E5%8D%97-v1.0.0%20%C2%B7%20%E4%B8%AD%E6%96%87-FF6B35?style=for-the-badge" alt="v1.0.0 体验指南（中文）"/></a>
   &nbsp;&nbsp;
   <a href="https://lcn6dqn3m0yr.feishu.cn/wiki/CkQSwHFdzibQFvkGzwPcmUOfnXg"><img src="https://img.shields.io/badge/%F0%9F%93%98%20User%20Guide-v1.0.0%20%C2%B7%20English-4F8EF7?style=for-the-badge" alt="v1.0.0 User Guide (English)"/></a>
@@ -91,6 +95,67 @@ https://github.com/user-attachments/assets/f4a2f1be-6615-4330-aea1-b86ccf42045e
 - **[灵活导出](packages/docs/content/docs/getting-started.zh-cn.mdx#导出课堂)** — 保留全部场景的 `.pptx`、能离线播放整堂课的单个 `.html` 文件，或用于迁移到其他部署的课堂 ZIP
 - **[Agent 工作台集成](#-agent-工作台集成)** — OpenMAIC Skill 支持 OpenClaw、Codex、DeepSeek、WorkBuddy 等，在飞书、Slack、Telegram 等 20+ 聊天应用或 IDE 里直接生成课堂
 
+## 🔐 LDAP 多租户版
+
+本仓库是 OpenMAIC 的 **LDAP 多租户版**。本版本应使用 LDAP 账号，而不是单用户或
+按浏览器匿名的身份模式：所有访问者都要在 `/login` 使用组织 LDAP 目录中的账号登录，
+每个目录用户在服务端拥有独立的课程库（课程、文件夹、对话历史、资料和设置互不可见）。AI 服务商的 Key
+只保存在服务端，模型配置由管理员统一固定。
+
+**必须填写 LDAP 信息。** 将 [`.env.local.example`](.env.local.example) 复制为
+`.env.local`，补全其中每一个 `<...>`。设置 `NEXT_PUBLIC_LDAP_ENABLED=true` 后，
+只要缺少任何必填项，服务端就会拒绝启动，并指出需要修复的变量名。
+
+| 变量 | 必填 | 说明 |
+| --- | --- | --- |
+| `NEXT_PUBLIC_LDAP_ENABLED` | 是 | 设为 `true` 开启 LDAP 登录。生产构建会把它编译进 middleware：必须在 `pnpm build` 前设置，修改后要重新构建。 |
+| `LDAP_URL` | 是 | 目录地址，推荐 `ldaps://host:636`，也支持 `ldap://host:389`。 |
+| `LDAP_STARTTLS` | 否 | `ldap://` 连接是否用 StartTLS 加密；使用 `ldaps://` 时必须为 `false`。 |
+| `LDAP_ALLOW_INSECURE` | 否 | 仅当目录既不支持 LDAPS 也不支持 StartTLS 时设为 `true`。此时密码在该链路上明文传输，服务端会打印警告。 |
+| `LDAP_BIND_DN` / `LDAP_BIND_PASSWORD` | 否 | 查询用户条目的只读服务账号，两项必须同时设置或同时留空；只有目录允许匿名查询时才可留空。Active Directory 也可填 UPN 或 `DOMAIN\user`。 |
+| `LDAP_SEARCH_BASE` | 是 | 用户条目所在的 DN，例如 `ou=people,dc=example,dc=com`。 |
+| `LDAP_USER_FILTER` | 是 | 包含 `{username}` 的 RFC 4515 过滤器，例如 `(uid={username})`；AD 使用 `(sAMAccountName={username})`。 |
+| `LDAP_USER_ID_ATTRIBUTE` | 否 | 稳定的用户 ID 属性，默认 `entryUUID`；Active Directory 使用 `objectGUID`。所有者 ID 由它派生，上线后再改会让该用户原有课程库无法找回。 |
+| `LDAP_DISPLAY_NAME_ATTRIBUTE` | 否 | 显示名属性，默认 `displayName`。 |
+| `LDAP_TIMEOUT_MS` | 否 | 目录请求超时（毫秒），默认 `5000`，范围 1000–60000。 |
+| `LDAP_SESSION_SECRET` | 是 | 用于签名 HttpOnly 会话 Cookie，至少 16 个字符；可用 `openssl rand -base64 32` 生成。 |
+| `LDAP_SESSION_TTL_SECONDS` | 否 | 会话有效期，默认 7 天（`604800`，范围 300–2592000），用户活跃时会续期。 |
+
+OpenLDAP 示例：
+
+```env
+NEXT_PUBLIC_LDAP_ENABLED=true
+LDAP_URL=ldaps://ldap.example.com:636
+LDAP_BIND_DN=cn=openmaic,ou=services,dc=example,dc=com
+LDAP_BIND_PASSWORD=<服务账号密码>
+LDAP_SEARCH_BASE=ou=people,dc=example,dc=com
+LDAP_USER_FILTER=(uid={username})
+LDAP_USER_ID_ATTRIBUTE=entryUUID
+LDAP_DISPLAY_NAME_ATTRIBUTE=displayName
+LDAP_SESSION_SECRET=<openssl-rand-base64-32-的输出>
+OWNER_ANONYMOUS_PREMINT=false
+```
+
+Active Directory 请使用 `LDAP_USER_FILTER=(sAMAccountName={username})` 和
+`LDAP_USER_ID_ATTRIBUTE=objectGUID`；服务账号可以填 UPN 或 `DOMAIN\user`，
+不必是 DN。
+
+注意事项：
+
+- `LDAP_BIND_PASSWORD` 中的字面 `$` 要写成 `\$`。环境变量加载器会展开 `$NAME`，
+  密码被截断时通常只表现为 bind 错误 49。
+- 使用 LDAP 时**不要**设置 `OWNER_SINGLE_USER=true` 或
+  `PERSISTENCE_SHARED_OWNER_ID`，它们与按用户注册互斥。`docker compose` 的默认值
+  会设置 `OWNER_SINGLE_USER=true`，因此 Docker 部署要在 `.env.local` 中显式写
+  `OWNER_SINGLE_USER=false`。
+- 保持 `OWNER_ANONYMOUS_PREMINT=false`，避免页面响应为每个浏览器铸造匿名所有者。
+- `ACCESS_CODE` 可选，会在 LDAP 前再加一道站点级密码；只用 LDAP 时留空。
+- 登录和退出入口：`/login`、`POST /api/auth/login`、`POST /api/auth/logout`。
+- Docker 部署时，`NEXT_PUBLIC_LDAP_ENABLED` 还是**构建参数**：执行
+  `docker compose up --build` 前，在 shell 或 `docker-compose.yml` 同目录的 `.env`
+  中设置 `NEXT_PUBLIC_LDAP_ENABLED=true`。`.env.local` 中也要保持为 `true`，
+  并填写完整的 `LDAP_*`，因为运行中的容器同样从这里读取该开关。
+
 ## 🚀 快速开始
 
 ### 环境要求
@@ -110,11 +175,16 @@ pnpm install
 ### 2. 配置
 
 ```bash
-cp .env.example .env.local            # API Key 与服务端选项
-cp openmaic.example.yml openmaic.yml  # 服务端使用哪些模型
+cp .env.local.example .env.local                     # LDAP 账号 + 服务端托管的 AI Key
+cp openmaic.server-managed.example.yml openmaic.yml  # 为所有用户固定模型
 ```
 
-复制出的示例只需要在 `.env.local` 中设置 `OPENAI_API_KEY`（也可以把其中的服务商换成你有 key 的那家）；其余内容都已注释，需要时再打开。`openmaic.yml` 声明服务端可以调用的**服务商**（账号），并为每个**槽位**（一处用到 AI 的地方：大纲、幻灯片内容、语音合成、联网搜索……）指定模型。Key 留在 `.env.local` 里，通过 `${VAR}` 引用：
+复制出的 `.env.local.example` 是这个版本专用的模板：除 `OPENAI_API_KEY` 和
+`OPENMAIC_SECRET_KEY` 外，还包含必须补全的 `LDAP_*` 配置（见
+[LDAP 多租户版](#-ldap-多租户版)）。复制出的 `openmaic.yml` 会锁定所有模型槽位
+并关闭用户自带 Key；有额外服务商时再取消对应注释。`openmaic.yml` 声明服务端可以
+调用的**服务商**（账号），并为每个**槽位**（一处用到 AI 的地方：大纲、幻灯片内容、
+语音合成、联网搜索……）指定模型。Key 留在 `.env.local` 里，通过 `${VAR}` 引用：
 
 ```yaml
 providers:
@@ -249,27 +319,33 @@ pnpm build && DATABASE_URL=postgres://... pnpm start
 ### Docker 部署
 
 ```bash
-cp .env.example .env.local
-# 编辑 .env.local 填入你的 API Key，然后：
-docker compose up --build
+cp .env.local.example .env.local
+# 编辑 .env.local：NEXT_PUBLIC_LDAP_ENABLED=true、LDAP_*、OPENAI_API_KEY、
+# OPENMAIC_SECRET_KEY，并设置 OWNER_SINGLE_USER=false。
+# 再导出同一个开关（或写入 docker-compose.yml 同目录的 .env），
+# 让它同时被编译进镜像：
+NEXT_PUBLIC_LDAP_ENABLED=true docker compose up --build
 ```
 
-打开 **http://localhost:3000**。整套服务是两个容器：应用和 PostgreSQL。课程、生成的媒体和运行时会话保存在命名卷 `openmaic-postgres` 与 `openmaic-data` 中，`docker compose down` 和重新构建后依然保留；`docker compose down -v` 会删除它们。如需用 `openmaic.yml` 配置模型，请从 `openmaic.example.yml` 复制出该文件，并取消 `docker-compose.yml` 中对应挂载行的注释；否则启动后在模型设置里接入模型服务即可。
+打开 **http://localhost:3000**。整套服务是两个容器：应用和 PostgreSQL。课程、生成的媒体和运行时会话保存在命名卷 `openmaic-postgres` 与 `openmaic-data` 中，`docker compose down` 和重新构建后依然保留；`docker compose down -v` 会删除它们。如需用 `openmaic.yml` 配置模型，请从 `openmaic.server-managed.example.yml` 复制出该文件，并取消 `docker-compose.yml` 中对应挂载行的注释；否则启动后在模型设置里接入模型服务即可。
 
-Compose 文件默认是**个人安装**：以[单用户模式](#服务端持久化postgresql)运行（所有浏览器看到同一个课程库），且只监听 `127.0.0.1:3000`。要让其他机器访问，请先加上保护：
+在本版本中，Compose 栈按 **LDAP 多租户**运行：设置
+`NEXT_PUBLIC_LDAP_ENABLED=true` 并填好 `LDAP_*` 后，每位访问者都要登录，
+各自拥有独立课程库。默认仍只监听 `127.0.0.1:3000`。要让其他机器访问：
 
-1. 在 `.env.local` 中设置足够长的随机 `ACCESS_CODE`（[详情](#可选access_code共享部署)）。没有它时，任何能访问该端口的人都拥有整个课程库，可以编辑甚至删除。
-2. 首次启动前，把 `PERSISTENCE_POSTGRES_PASSWORD` 设为只含字母和数字的随机值。
-3. 发布到网络地址：
+1. 继续用 LDAP 作为登录门禁；也可以在 `.env.local` 中设置足够长的随机 `ACCESS_CODE`（[详情](#可选access_code共享部署)）作为额外的站点级密码。
+2. 在 `.env.local` 中设置 `OWNER_SINGLE_USER=false`；LDAP 注册与 `docker-compose.defaults.env` 里的单用户默认值冲突。
+3. 首次启动前，把 `PERSISTENCE_POSTGRES_PASSWORD` 设为只含字母和数字的随机值。
+4. 发布到网络地址：
 
    ```bash
-   OPENMAIC_PUBLISH_ADDRESS=0.0.0.0 docker compose up -d --build
+   NEXT_PUBLIC_LDAP_ENABLED=true OPENMAIC_PUBLISH_ADDRESS=0.0.0.0 docker compose up -d --build
    ```
 
-`OPENMAIC_PUBLISH_ADDRESS`、`OPENMAIC_PORT` 和 `PERSISTENCE_POSTGRES_PASSWORD` 来自 shell 或 `docker-compose.yml` 旁边的 `.env` 文件，而不是 `.env.local`。覆盖 Compose 默认值、轮换数据库密码以及完整的升级说明见 [Hosting and identity](packages/docs/content/docs/hosting.mdx#docker-compose-as-a-personal-installation)（英文）。
+`NEXT_PUBLIC_LDAP_ENABLED`、`OPENMAIC_PUBLISH_ADDRESS`、`OPENMAIC_PORT` 和 `PERSISTENCE_POSTGRES_PASSWORD` 来自 shell 或 `docker-compose.yml` 旁边的 `.env` 文件，而不是 `.env.local`。覆盖 Compose 默认值、轮换数据库密码以及完整的升级说明见 [Hosting and identity](packages/docs/content/docs/hosting.mdx#docker-compose-as-a-personal-installation)（英文）。
 
 > [!IMPORTANT]
-> **升级已有的 Compose 部署？** 现在总会启动 PostgreSQL，应用只发布在 `127.0.0.1` 上，所有访客都是同一个所有者。如果 `.env.local` 设置了 `PERSISTENCE_SHARED_OWNER_ID`，请同时设置 `OWNER_SINGLE_USER=false`，否则应用拒绝启动。升级前请先阅读 [Upgrading a Compose deployment](packages/docs/content/docs/hosting.mdx#upgrading-a-compose-deployment)（英文）。
+> **升级已有的 Compose 部署？** 现在总会启动 PostgreSQL，应用只发布在 `127.0.0.1` 上；未启用 LDAP 时所有访客都是同一个所有者。本版本应改用 LDAP：设置 `NEXT_PUBLIC_LDAP_ENABLED=true`、填好 `LDAP_*`，并设置 `OWNER_SINGLE_USER=false`（如果 `.env.local` 设置了 `PERSISTENCE_SHARED_OWNER_ID` 也必须这样设置，否则应用拒绝启动）。升级前请先阅读 [Upgrading a Compose deployment](packages/docs/content/docs/hosting.mdx#upgrading-a-compose-deployment)（英文）。
 
 <details>
 <summary><b>慢速网络 / 中国大陆构建加速</b></summary>

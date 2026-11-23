@@ -22,12 +22,14 @@ services:
         - NEXT_PUBLIC_WORKBENCH_ENABLED=${NEXT_PUBLIC_WORKBENCH_ENABLED:-}
         # Previous name of NEXT_PUBLIC_WORKBENCH_ENABLED, still read for one release.
         - NEXT_PUBLIC_PRO_WORKBENCH_ENABLED=${NEXT_PUBLIC_PRO_WORKBENCH_ENABLED:-}
-    # Published on loopback by default: the single-user owner (see
-    # docker-compose.defaults.env) serves one course library to every request,
-    # so only this machine should reach it. To publish on the network, set
-    # ACCESS_CODE in .env.local (strongly recommended: without it anyone who
-    # reaches the port shares, edits and can delete the library) and start with
-    # OPENMAIC_PUBLISH_ADDRESS=0.0.0.0 (or a specific interface address).
+        # LDAP login gate, compiled into the Edge middleware at build time.
+        - NEXT_PUBLIC_LDAP_ENABLED=${NEXT_PUBLIC_LDAP_ENABLED:-}
+    # Published on loopback by default: the bundled defaults (see
+    # docker-compose.defaults.env) run one single-user owner for every request,
+    # so only this machine should reach it. With LDAP enabled that owner is
+    # replaced by per-account libraries, but the port still starts on loopback.
+    # To publish on the network, set ACCESS_CODE in .env.local as an extra gate
+    # and start with OPENMAIC_PUBLISH_ADDRESS=0.0.0.0 (or an interface address).
     ports:
       - '${OPENMAIC_PUBLISH_ADDRESS:-127.0.0.1}:${OPENMAIC_PORT:-3000}:3000'
     env_file:

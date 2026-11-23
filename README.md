@@ -11,6 +11,10 @@
 </p>
 
 <p align="center">
+  <b>LDAP multi-tenant edition</b> — fill in the <code>LDAP_*</code> values in <code>.env.local</code> before starting. <a href="#-ldap-multi-tenant-edition">Setup details</a>
+</p>
+
+<p align="center">
   <a href="https://lcn6dqn3m0yr.feishu.cn/wiki/CkQSwHFdzibQFvkGzwPcmUOfnXg"><img src="https://img.shields.io/badge/%F0%9F%93%98%20User%20Guide-v1.0.0%20%C2%B7%20English-4F8EF7?style=for-the-badge" alt="v1.0.0 User Guide (English)"/></a>
   &nbsp;&nbsp;
   <a href="https://my.feishu.cn/wiki/UIfKw9Knti0LcKkTxDNcqlUrnzh"><img src="https://img.shields.io/badge/%F0%9F%93%99%20%E4%BD%93%E9%AA%8C%E6%8C%87%E5%8D%97-v1.0.0%20%C2%B7%20%E4%B8%AD%E6%96%87-FF6B35?style=for-the-badge" alt="v1.0.0 体验指南（中文）"/></a>
@@ -90,6 +94,75 @@ https://github.com/user-attachments/assets/8f3f1e5f-1468-4e93-8054-afeeea683a61
 - **[Export anywhere](packages/docs/content/docs/getting-started.mdx#export-a-classroom)** — A `.pptx` that keeps every scene, one offline `.html` file that plays the whole lesson, or a classroom ZIP to move it to another deployment
 - **[Agent workbench integration](#-agent-workbench-integration)** — The OpenMAIC Skill supports OpenClaw, Codex, DeepSeek, WorkBuddy, and more — generate classrooms from Feishu, Slack, Telegram, 20+ messaging apps, or your IDE
 
+## 🔐 LDAP multi-tenant edition
+
+This repository is the **LDAP multi-tenant edition** of OpenMAIC. It is meant to
+run with LDAP accounts instead of single-user or per-browser anonymous ownership:
+every visitor signs in at `/login` with an account from your organization's LDAP
+directory, and each directory user gets a separate course library (courses,
+folders, chat history, materials and settings).
+AI provider keys stay on the server, and the administrator fixes the model
+configuration for everyone.
+
+**An LDAP directory is required.** Copy [`.env.local.example`](.env.local.example)
+to `.env.local` and fill in every `<...>` value. With
+`NEXT_PUBLIC_LDAP_ENABLED=true`, an incomplete configuration stops the server at
+boot and names the setting to fix.
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `NEXT_PUBLIC_LDAP_ENABLED` | yes | Set `true` to turn on LDAP login. It is compiled into the production build: set it before `pnpm build` and rebuild after changing it. |
+| `LDAP_URL` | yes | Directory URL, `ldaps://host:636` (recommended) or `ldap://host:389`. |
+| `LDAP_STARTTLS` | no | `true` to upgrade a plain `ldap://` connection with StartTLS. Must be `false` with `ldaps://`. |
+| `LDAP_ALLOW_INSECURE` | no | `true` only for a directory with neither LDAPS nor StartTLS. Credentials cross that hop in clear text and the server logs a warning. |
+| `LDAP_BIND_DN` / `LDAP_BIND_PASSWORD` | no | Read-only service account used to find the user entry. Leave both empty only if anonymous search is allowed. Active Directory also accepts a UPN or `DOMAIN\user`. |
+| `LDAP_SEARCH_BASE` | yes | DN under which user entries live, for example `ou=people,dc=example,dc=com`. |
+| `LDAP_USER_FILTER` | yes | RFC 4515 filter containing `{username}`, for example `(uid={username})`. Active Directory uses `(sAMAccountName={username})`. |
+| `LDAP_USER_ID_ATTRIBUTE` | no | Stable per-user id attribute; defaults to `entryUUID`. Use `objectGUID` for Active Directory. The owner id is derived from it, so changing it later strands that user's existing library. |
+| `LDAP_DISPLAY_NAME_ATTRIBUTE` | no | Display-name attribute; defaults to `displayName`. |
+| `LDAP_TIMEOUT_MS` | no | Directory request timeout in milliseconds; defaults to `5000` (1000–60000). |
+| `LDAP_SESSION_SECRET` | yes | Signs the HttpOnly session cookie. At least 16 characters; generate one with `openssl rand -base64 32`. |
+| `LDAP_SESSION_TTL_SECONDS` | no | Session lifetime; defaults to 7 days (`604800`, range 300–2592000), renewed while the user is active. |
+
+OpenLDAP example:
+
+```env
+NEXT_PUBLIC_LDAP_ENABLED=true
+LDAP_URL=ldaps://ldap.example.com:636
+LDAP_BIND_DN=cn=openmaic,ou=services,dc=example,dc=com
+LDAP_BIND_PASSWORD=<service-account-password>
+LDAP_SEARCH_BASE=ou=people,dc=example,dc=com
+LDAP_USER_FILTER=(uid={username})
+LDAP_USER_ID_ATTRIBUTE=entryUUID
+LDAP_DISPLAY_NAME_ATTRIBUTE=displayName
+LDAP_SESSION_SECRET=<output-of-openssl-rand-base64-32>
+OWNER_ANONYMOUS_PREMINT=false
+```
+
+For Active Directory, use `LDAP_USER_FILTER=(sAMAccountName={username})` and
+`LDAP_USER_ID_ATTRIBUTE=objectGUID`; the service account may be a UPN or
+`DOMAIN\user` instead of a DN.
+
+Notes:
+
+- Escape a literal `$` in `LDAP_BIND_PASSWORD` as `\$`. The env loader expands
+  `$NAME`, and a truncated password only shows up as bind error 49.
+- Do **not** set `OWNER_SINGLE_USER=true` or `PERSISTENCE_SHARED_OWNER_ID` with
+  LDAP accounts: both conflict with per-user registration. The Compose defaults
+  set `OWNER_SINGLE_USER=true`, so a Docker deployment must set
+  `OWNER_SINGLE_USER=false` in `.env.local`.
+- Keep `OWNER_ANONYMOUS_PREMINT=false` so page responses do not mint a
+  per-browser anonymous owner.
+- `ACCESS_CODE` is optional and adds a site-wide password in front of LDAP.
+  Leave it unset when LDAP is the only gate.
+- Sign-in and sign-out live at `/login`, `POST /api/auth/login` and
+  `POST /api/auth/logout`.
+- For Docker, `NEXT_PUBLIC_LDAP_ENABLED` is also a **build argument**: set it to
+  `true` in the shell or the `.env` file next to `docker-compose.yml` before
+  `docker compose up --build`. Keep it `true` in `.env.local` as well, together
+  with the full `LDAP_*` block, because the running container reads the flag
+  there too.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -110,11 +183,18 @@ pnpm install
 ### 2. Configure
 
 ```bash
-cp .env.example .env.local            # API keys and server options
-cp openmaic.example.yml openmaic.yml  # which models the server uses
+cp .env.local.example .env.local                     # LDAP accounts + server-managed AI key
+cp openmaic.server-managed.example.yml openmaic.yml  # fixed models for every user
 ```
 
-The copied example needs only `OPENAI_API_KEY` in `.env.local` (or change its provider to one you have a key for); everything else in it is commented out until you want it. `openmaic.yml` declares **providers** (accounts the server can call) and gives each **slot** (a use of AI: the outline, slide content, text to speech, web search, …) a model. Keys stay in `.env.local` and are referenced as `${VAR}`:
+The copied `.env.local.example` is this edition's template. Besides
+`OPENAI_API_KEY` and `OPENMAIC_SECRET_KEY`, it contains the `LDAP_*` block you
+must complete (see [LDAP multi-tenant edition](#-ldap-multi-tenant-edition)).
+The copied `openmaic.yml` locks every model slot and turns off user-supplied
+keys; uncomment the optional providers you have keys for. `openmaic.yml`
+declares **providers** (accounts the server can call) and gives each **slot**
+(a use of AI: the outline, slide content, text to speech, web search, …) a
+model. Keys stay in `.env.local` and are referenced as `${VAR}`:
 
 ```yaml
 providers:
@@ -255,27 +335,34 @@ configuration and for upgrading from 1.1.x.
 ### Docker Deployment
 
 ```bash
-cp .env.example .env.local
-# Edit .env.local with your API keys, then:
-docker compose up --build
+cp .env.local.example .env.local
+# Edit .env.local: NEXT_PUBLIC_LDAP_ENABLED=true, LDAP_* values,
+# OPENAI_API_KEY, OPENMAIC_SECRET_KEY, and OWNER_SINGLE_USER=false.
+# Export the same flag (or put it in a .env file next to docker-compose.yml)
+# so it is also compiled into the image:
+NEXT_PUBLIC_LDAP_ENABLED=true docker compose up --build
 ```
 
-Open **http://localhost:3000**. The stack is two containers, the app and PostgreSQL. Courses, generated media and runtime sessions live in the named volumes `openmaic-postgres` and `openmaic-data`, which survive `docker compose down` and rebuilds; `docker compose down -v` deletes them. To configure models with `openmaic.yml`, create it from `openmaic.example.yml` and uncomment its mount in `docker-compose.yml`; otherwise connect a model service in the model settings once the app is running.
+Open **http://localhost:3000**. The stack is two containers, the app and PostgreSQL. Courses, generated media and runtime sessions live in the named volumes `openmaic-postgres` and `openmaic-data`, which survive `docker compose down` and rebuilds; `docker compose down -v` deletes them. To configure models with `openmaic.yml`, create it from `openmaic.server-managed.example.yml` and uncomment its mount in `docker-compose.yml`; otherwise connect a model service in the model settings once the app is running.
 
-The Compose file is a **personal installation**: it runs in [single-user mode](#server-backed-persistence-postgresql) (every browser sees one shared library) and listens on `127.0.0.1:3000` only. To serve other machines, protect it first:
+In this edition the Compose stack runs as an **LDAP multi-tenant installation**:
+once `NEXT_PUBLIC_LDAP_ENABLED=true` and the `LDAP_*` values are set, every
+visitor signs in and gets a separate library. It still listens on
+`127.0.0.1:3000` by default. To serve other machines:
 
-1. Set a long random `ACCESS_CODE` in `.env.local` ([details](#optional-access_code-shared-deployments)). Without it, anyone who can reach the port owns, edits and can delete the whole library.
-2. Before the first start, set `PERSISTENCE_POSTGRES_PASSWORD` to a random value of letters and digits.
-3. Publish on the network address:
+1. Keep LDAP as the sign-in gate; optionally add a long random `ACCESS_CODE` in `.env.local` ([details](#optional-access_code-shared-deployments)) as an extra site-wide password.
+2. Set `OWNER_SINGLE_USER=false` in `.env.local`; LDAP registration conflicts with the single-user default in `docker-compose.defaults.env`.
+3. Before the first start, set `PERSISTENCE_POSTGRES_PASSWORD` to a random value of letters and digits.
+4. Publish on the network address:
 
    ```bash
-   OPENMAIC_PUBLISH_ADDRESS=0.0.0.0 docker compose up -d --build
+   NEXT_PUBLIC_LDAP_ENABLED=true OPENMAIC_PUBLISH_ADDRESS=0.0.0.0 docker compose up -d --build
    ```
 
-`OPENMAIC_PUBLISH_ADDRESS`, `OPENMAIC_PORT` and `PERSISTENCE_POSTGRES_PASSWORD` come from your shell or a `.env` file next to `docker-compose.yml`, not from `.env.local`. Overriding the Compose defaults, rotating the database password and the full upgrade notes are in [Hosting and identity](packages/docs/content/docs/hosting.mdx#docker-compose-as-a-personal-installation).
+`NEXT_PUBLIC_LDAP_ENABLED`, `OPENMAIC_PUBLISH_ADDRESS`, `OPENMAIC_PORT` and `PERSISTENCE_POSTGRES_PASSWORD` come from your shell or a `.env` file next to `docker-compose.yml`, not from `.env.local`. Overriding the Compose defaults, rotating the database password and the full upgrade notes are in [Hosting and identity](packages/docs/content/docs/hosting.mdx#docker-compose-as-a-personal-installation).
 
 > [!IMPORTANT]
-> **Upgrading a Compose deployment?** PostgreSQL now always starts, the app is published on `127.0.0.1` only, and every visitor is the same single owner. If `.env.local` sets `PERSISTENCE_SHARED_OWNER_ID`, also set `OWNER_SINGLE_USER=false`, or the app refuses to start. Read [Upgrading a Compose deployment](packages/docs/content/docs/hosting.mdx#upgrading-a-compose-deployment) first.
+> **Upgrading a Compose deployment?** PostgreSQL now always starts, the app is published on `127.0.0.1` only, and without LDAP every visitor is the same single owner. This edition expects LDAP instead: set `NEXT_PUBLIC_LDAP_ENABLED=true`, fill the `LDAP_*` block, and set `OWNER_SINGLE_USER=false` (also required if `.env.local` sets `PERSISTENCE_SHARED_OWNER_ID`, or the app refuses to start). Read [Upgrading a Compose deployment](packages/docs/content/docs/hosting.mdx#upgrading-a-compose-deployment) first.
 
 <details>
 <summary><b>Slow-network / China build acceleration</b></summary>
