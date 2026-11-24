@@ -7,6 +7,7 @@
  */
 import { isSameOriginJsonRequest } from '@/lib/persistence/owner-claim-http';
 import { apiError, apiSuccess } from '@/lib/server/api-response';
+import { clearGuestCookies } from '@/lib/server/identity/classroom-guest/cookies';
 import { ldapEnabled } from '@/lib/server/identity/ldap/config';
 import { clearLdapSessionCookie } from '@/lib/server/identity/ldap/session';
 
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
 
   const response = apiSuccess({ ok: true });
   response.headers.append('Set-Cookie', clearLdapSessionCookie());
+  for (const cookie of clearGuestCookies()) response.headers.append('Set-Cookie', cookie);
   response.headers.set('Cache-Control', 'no-store');
   return response;
 }

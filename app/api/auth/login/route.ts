@@ -11,6 +11,7 @@ import { isSameOriginJsonRequest } from '@/lib/persistence/owner-claim-http';
 import { SlidingWindowFailureLimiter } from '@/lib/server/attempt-limiter';
 import { apiError, apiSuccess } from '@/lib/server/api-response';
 import { clientIdentity } from '@/lib/server/client-identity';
+import { clearGuestCookies } from '@/lib/server/identity/classroom-guest/cookies';
 import { ldapEnabled, readLdapConfig } from '@/lib/server/identity/ldap/config';
 import {
   authenticateLdapUser,
@@ -100,5 +101,8 @@ export async function POST(request: Request) {
     user: { name: identity.displayName ?? identity.userId },
   });
   response.headers.append('Set-Cookie', ldapSessionSetCookie(token, config.sessionTtlSeconds));
+  // A signed-in account is not a classroom guest: drop the visitor cookies so
+  // later requests resolve as the account even on a course link.
+  for (const cookie of clearGuestCookies()) response.headers.append('Set-Cookie', cookie);
   return noStore(response);
 }

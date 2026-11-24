@@ -12,6 +12,15 @@ import {
   isDocumentNavigation,
   type NavigationIdentity,
 } from '@/lib/server/identity/navigation';
+import {
+  guestSetCookies,
+  guestStageCookie,
+  isGuestRequest,
+  mintGuestOwnerId,
+  readGuestOwner,
+} from '@/lib/server/identity/classroom-guest/cookies';
+import { isGuestAllowedApiPath } from '@/lib/server/identity/classroom-guest/paths';
+import { readCookieValue } from '@/lib/server/identity/ldap/session-shared';
 
 /**
  * Let the request through, carrying the anonymous owner a page request
@@ -72,6 +81,17 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // A classroom opened by link or QR code is the one place an anonymous
+  // browser is let through in an LDAP deployment. The page itself (Node)
+  // decides whether the course is published; these cookies only name the
+  // guest and remember which classroom is on screen.
+  const guestCookies = classroomGuestPass(request);
+  if (guestCookies) {
+    const response = next(request, identity);
+    for (const cookie of guestCookies) response.headers.append('set-cookie', cookie);
+    return response;
+  }
+
   // LDAP accounts: page navigations without a live session go to /login, and
   // every other request that is not the login/logout surface is refused. The
   // signature is checked by the owner auth method in Node; here only the
@@ -84,6 +104,46 @@ export async function middleware(request: NextRequest) {
 }
 
 const LDAP_PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/auth/logout', '/api/health'];
+
+function hasLiveLdapSession(request: NextRequest): boolean {
+  const token = readCookieValue(request.headers, LDAP_SESSION_COOKIE);
+  return !!token && !!decodeLdapSessionPayload(token);
+}
+
+/**
+ * Cookies to attach when this request is the anonymous classroom surface, or
+ * `undefined` when it is not. An empty array means "let it through, nothing to
+ * set": an API call already carrying guest cookies.
+ */
+function classroomGuestPass(request: NextRequest): string[] | undefined {
+  if (!ldapEnabled() || hasLiveLdapSession(request)) return undefined;
+  const { pathname } = request.nextUrl;
+
+  if (pathname === '/classroom' || pathname.startsWith('/classroom/')) {
+    // A first visit is a document navigation; later client-side navigation is
+    // an RSC/prefetch request that already has the guest cookies.
+    if (!isDocumentNavigation({ method: request.method, headers: request.headers, pathname })) {
+      return isGuestRequest(request.headers) && readGuestOwner(request.headers)
+        ? []
+        : undefined;
+    }
+    const ownerId = readGuestOwner(request.headers) ?? mintGuestOwnerId();
+    const cookies = readGuestOwner(request.headers) ? [] : guestSetCookies(ownerId);
+    const stageId = /^\/classroom\/([A-Za-z0-9_-]+)/.exec(pathname)?.[1];
+    if (stageId) cookies.push(guestStageCookie(stageId));
+    return cookies;
+  }
+
+  if (
+    pathname.startsWith('/api/') &&
+    isGuestAllowedApiPath(pathname, request.method) &&
+    isGuestRequest(request.headers) &&
+    readGuestOwner(request.headers)
+  ) {
+    return [];
+  }
+  return undefined;
+}
 
 function ldapGate(request: NextRequest): NextResponse | undefined {
   if (!ldapEnabled()) return undefined;
