@@ -59,7 +59,14 @@ const LOAD_UNAVAILABLE_ERROR = 'load-unavailable';
 // stage_link can become visible shortly before its document. Probe only that
 // explicit availability gap, with a small bounded backoff; media conversion
 // and ordinary failures never enter this schedule.
-export function ClassroomSurface(props: { classroomId: string; variant?: 'page' | 'pane' }) {
+export function ClassroomSurface(props: {
+  classroomId: string;
+  variant?: 'page' | 'pane';
+  /** Anonymous visitor mode (the standalone page only). */
+  guest?: boolean;
+  /** Whether this guest's records may be kept in the browser. */
+  guestLocalRecords?: boolean;
+}) {
   return (
     <PblActivityProvider classroomId={props.classroomId}>
       <ClassroomSurfaceContent {...props} />
@@ -73,6 +80,8 @@ function ClassroomSurfaceContent({
 }: {
   readonly classroomId: string;
   readonly variant?: 'page' | 'pane';
+  readonly guest?: boolean;
+  readonly guestLocalRecords?: boolean;
 }) {
   const { loadFromStorage } = useStageStore();
   const loadedClassroomId = useStageStore((s) => s.stage?.id ?? null);
