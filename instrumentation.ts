@@ -311,10 +311,17 @@ async function validateBootConfiguration(): Promise<void> {
       );
     }
     const { createLdapAuthMethod } = await import('@/lib/server/identity/ldap/auth-method');
+    const { classroomGuestAuthMethod } =
+      await import('@/lib/server/identity/classroom-guest/auth-method');
     const { configureOwnerAuthentication } = await import('@/lib/server/identity');
     runConfigurationCheck(() =>
       configureOwnerAuthentication({
-        methods: [createLdapAuthMethod({ config })],
+        // Guests first, but the method declines a live LDAP session, so an
+        // account always wins over a leftover guest cookie. LDAP last.
+        methods: [
+          classroomGuestAuthMethod({ ldapSessionSecret: config.sessionSecret }),
+          createLdapAuthMethod({ config }),
+        ],
         anonymousFallback: false,
       }),
     );
