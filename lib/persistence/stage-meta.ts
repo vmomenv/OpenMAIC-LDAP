@@ -5,7 +5,16 @@ import { applySchemaMigrations, type SchemaMigrationSet } from '@openmaic/storag
 import { ensureLegacyImportBindingSchema } from './legacy-import-bindings';
 import { ensureOwnerMergeSchema } from './owner-merges';
 
-export interface StageMetaRow {
+/** What an anonymous visitor may do inside a published course. */
+export interface GuestPermissions {
+  guestQuiz: boolean;
+  guestTts: boolean;
+  guestChat: boolean;
+  guestPbl: boolean;
+  guestLocalRecords: boolean;
+}
+
+export interface StageMetaRow extends GuestPermissions {
   stageId: string;
   ownerId: string;
   isPublic: boolean;
@@ -22,6 +31,11 @@ interface RawStageMetaRow extends Record<string, unknown> {
   is_public: boolean;
   published_at: number | string | null;
   generation_complete: boolean;
+  guest_quiz: boolean;
+  guest_tts: boolean;
+  guest_chat: boolean;
+  guest_pbl: boolean;
+  guest_local_records: boolean;
   deleted_at: Date | string | null;
 }
 
@@ -135,11 +149,36 @@ async function adoptLegacyDocumentOwnersOnce(queryable: Queryable): Promise<void
   }
 }
 
+/**
+ * Version 3: the per-course capabilities an anonymous visitor gets once the
+ * course is published. `is_public` remains the master switch (sharing the
+ * course publishes it); these columns only narrow what a guest may do.
+ * `guest_local_records` is on by default because the classroom writes a
+ * visitor's records to their own browser, not to the server.
+ */
+export const GUEST_PERMISSIONS_SCHEMA = `
+ALTER TABLE stage_meta
+  ADD COLUMN IF NOT EXISTS guest_quiz BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE stage_meta
+  ADD COLUMN IF NOT EXISTS guest_tts BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE stage_meta
+  ADD COLUMN IF NOT EXISTS guest_chat BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE stage_meta
+  ADD COLUMN IF NOT EXISTS guest_pbl BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE stage_meta
+  ADD COLUMN IF NOT EXISTS guest_local_records BOOLEAN NOT NULL DEFAULT true;
+`;
+
 export const STAGE_META_MIGRATIONS: SchemaMigrationSet = {
   store: 'stage-meta',
   migrations: [
     { version: 1, name: 'baseline', up: STAGE_META_SCHEMA, transaction: false },
     { version: 2, name: 'adopt_legacy_document_owners', up: adoptLegacyDocumentOwnersOnce },
+    { version: 3, name: 'guest_permissions', up: GUEST_PERMISSIONS_SCHEMA, transaction: false },
   ],
 };
 
@@ -160,7 +199,9 @@ export async function readStageMeta(
   stageId: string,
 ): Promise<StageMetaRow | null> {
   const result = await queryable.query<RawStageMetaRow>(
-    `SELECT stage_id, owner_id, is_public, published_at, generation_complete, deleted_at
+    `SELECT stage_id, owner_id, is_public, published_at, generation_complete,
+            guest_quiz, guest_tts, guest_chat, guest_pbl, guest_local_records,
+            deleted_at
        FROM stage_meta
       WHERE stage_id = $1`,
     [stageId],
@@ -179,6 +220,11 @@ export async function readStageMeta(
           ? publishedAt
           : Number(publishedAt),
     generationComplete: row.generation_complete === true,
+    guestQuiz: row.guest_quiz === true,
+    guestTts: row.guest_tts === true,
+    guestChat: row.guest_chat === true,
+    guestPbl: row.guest_pbl === true,
+    guestLocalRecords: row.guest_local_records === true,
     deletedAt:
       row.deleted_at === null
         ? null
@@ -253,6 +299,41 @@ export async function markStageGenerationComplete(
     [stageId],
   );
   return result.rows.length === 1;
+}
+
+const GUEST_PERMISSION_COLUMNS: Record<keyof GuestPermissions, string> = {
+  guestQuiz: 'guest_quiz',
+  guestTts: 'guest_tts',
+  guestChat: 'guest_chat',
+  guestPbl: 'guest_pbl',
+  guestLocalRecords: 'guest_local_records',
+};
+
+/**
+ * Update only the guest capabilities named in `patch` on a live course.
+ * Absent keys are left alone, so the UI can flip one checkbox at a time.
+ * Unknown keys are ignored by construction (the map above is the vocabulary).
+ */
+export async function setStageGuestPermissions(
+  queryable: Queryable,
+  stageId: string,
+  patch: Partial<GuestPermissions>,
+): Promise<void> {
+  const assignments: string[] = [];
+  const params: unknown[] = [stageId];
+  for (const [key, column] of Object.entries(GUEST_PERMISSION_COLUMNS)) {
+    const value = patch[key as keyof GuestPermissions];
+    if (value === undefined) continue;
+    params.push(value);
+    assignments.push(`${column} = $${params.length}`);
+  }
+  if (assignments.length === 0) return;
+  await queryable.query(
+    `UPDATE stage_meta
+        SET ${assignments.join(', ')}
+      WHERE stage_id = $1 AND deleted_at IS NULL`,
+    params,
+  );
 }
 
 /** Publish (isPublic=true, publishedAt set) or unpublish (isPublic=false, publishedAt cleared). */

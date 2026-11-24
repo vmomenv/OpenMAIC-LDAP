@@ -26,6 +26,11 @@ export interface StageAccess {
   isPublic: boolean;
   publishedAt: number | null;
   generationComplete: boolean;
+  guestQuiz: boolean;
+  guestTts: boolean;
+  guestChat: boolean;
+  guestPbl: boolean;
+  guestLocalRecords: boolean;
   source: 'document';
   deletedAt: Date | null;
 }
@@ -35,17 +40,27 @@ interface RawAccessRow extends Record<string, unknown> {
   meta_is_public: boolean | null;
   meta_published_at: string | number | null;
   meta_generation_complete: boolean | null;
+  meta_guest_quiz: boolean | null;
+  meta_guest_tts: boolean | null;
+  meta_guest_chat: boolean | null;
+  meta_guest_pbl: boolean | null;
+  meta_guest_local_records: boolean | null;
   meta_deleted_at: Date | string | null;
   document_name: string | null;
 }
 
 const ACCESS_SQL = `
-  SELECT m.owner_id            AS meta_owner_id,
-         m.is_public           AS meta_is_public,
-         m.published_at        AS meta_published_at,
-         m.generation_complete AS meta_generation_complete,
-         m.deleted_at          AS meta_deleted_at,
-         d.name                AS document_name
+  SELECT m.owner_id             AS meta_owner_id,
+         m.is_public            AS meta_is_public,
+         m.published_at         AS meta_published_at,
+         m.generation_complete  AS meta_generation_complete,
+         m.guest_quiz           AS meta_guest_quiz,
+         m.guest_tts            AS meta_guest_tts,
+         m.guest_chat           AS meta_guest_chat,
+         m.guest_pbl            AS meta_guest_pbl,
+         m.guest_local_records  AS meta_guest_local_records,
+         m.deleted_at           AS meta_deleted_at,
+         d.name                 AS document_name
     FROM (SELECT $1::text AS stage_id) k
     LEFT JOIN stage_meta      m ON m.stage_id = k.stage_id
     LEFT JOIN document_stages d ON d.id       = k.stage_id
@@ -110,6 +125,11 @@ export async function readStageAccessIncludingDeleted(
     isPublic: row.meta_is_public === true,
     publishedAt: toEpochMillis(row.meta_published_at),
     generationComplete: row.meta_generation_complete === true,
+    guestQuiz: row.meta_guest_quiz === true,
+    guestTts: row.meta_guest_tts === true,
+    guestChat: row.meta_guest_chat === true,
+    guestPbl: row.meta_guest_pbl === true,
+    guestLocalRecords: row.meta_guest_local_records === true,
     source: 'document',
     deletedAt: toDate(row.meta_deleted_at),
   };

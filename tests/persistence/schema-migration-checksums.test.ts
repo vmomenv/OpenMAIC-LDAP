@@ -54,6 +54,13 @@ const SHIPPED: readonly (readonly [
     'd53921614f5337fb5f300e788e037968aa10c6d303a52d1e0b5a493468354834',
   ],
   [
+    'stage-meta',
+    3,
+    'guest_permissions',
+    false,
+    '073059357a730a22c4ef2ec20e0efc531ebe9414a0b9374b5ad680192ec7ac3c',
+  ],
+  [
     'owner-merges',
     1,
     'baseline',
