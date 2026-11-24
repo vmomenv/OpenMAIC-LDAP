@@ -48,9 +48,9 @@ describe('stage meta guest permissions', () => {
         'copyLink',
         'copied',
       ]) {
-        expect(typeof (locale as Record<string, Record<string, string>>).guestAccess?.[key]).toBe(
-          'string',
-        );
+        expect(
+          typeof (locale as unknown as Record<string, Record<string, string>>).guestAccess?.[key],
+        ).toBe('string');
       }
     }
   });

@@ -31,14 +31,14 @@ describe('MemoryRuntimeStore', () => {
   it('keeps a session and its records for the lifetime of the object only', async () => {
     const store = new MemoryRuntimeStore();
     await store.createSession(session('s1'));
-    await store.appendRecord({ id: 'r1', sessionId: 's1', payload: { role: 'user' } });
+    await store.appendRecord({ id: 'r1', sessionId: 's1', payload: { role: 'user' }, createdAt: '2026-01-01T00:00:00.000Z' });
 
     await expect(store.getSession('s1')).resolves.toMatchObject({
       id: 's1',
       runtimeDslVersion: '0.1.0',
     });
     await expect(store.listRecords('s1')).resolves.toMatchObject([
-      { id: 'r1', seq: 0, payload: { role: 'user' } },
+      { id: 'r1', seq: 0, payload: { role: 'user' }, createdAt: '2026-01-01T00:00:00.000Z' },
     ]);
     await expect(store.listSessions('stage-1', 'anon:one')).resolves.toHaveLength(1);
   });
@@ -49,9 +49,9 @@ describe('MemoryRuntimeStore', () => {
     await expect(store.createSession(session('s1'))).rejects.toMatchObject({
       code: 'SESSION_ALREADY_EXISTS',
     });
-    await store.setSessionStatus('s1', 'closed', '2026-01-02T00:00:00.000Z');
+    await store.setSessionStatus('s1', 'completed', '2026-01-02T00:00:00.000Z');
     await expect(
-      store.appendRecord({ id: 'r1', sessionId: 's1', payload: { role: 'user' } }),
+      store.appendRecord({ id: 'r1', sessionId: 's1', payload: { role: 'user' }, createdAt: '2026-01-01T00:00:00.000Z' }),
     ).rejects.toThrow();
   });
 

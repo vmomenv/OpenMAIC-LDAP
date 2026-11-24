@@ -6,6 +6,7 @@
  * takes effect immediately. Signed-in LDAP users skip them.
  */
 import { resolveStageAccess } from '@/lib/server/stage-access';
+import type { OwnerPrincipal } from '../types';
 import { ldapEnabled, readLdapConfig } from '../ldap/config';
 import { readLdapSessionToken, verifyLdapSession } from '../ldap/session';
 import { isValidStageId, isGuestRequest, readGuestOwner } from './cookies';
@@ -15,6 +16,11 @@ export type GuestCapability = 'quiz' | 'tts' | 'chat' | 'pbl';
 interface GuestCheckRequest {
   readonly headers: Headers;
   readonly url?: string;
+}
+
+/** Whether this request resolved as an anonymous classroom visitor. */
+export function isClassroomGuest(principal: Pick<OwnerPrincipal, 'channel'>): boolean {
+  return principal.channel === 'classroom-guest';
 }
 
 /** Whether the request carries a live LDAP account session. */

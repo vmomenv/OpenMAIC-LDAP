@@ -5,7 +5,17 @@ import type { StageMetaResult } from '@/lib/classroom/stage-meta-client';
 
 const found = (isOwner: boolean): StageMetaResult => ({
   outcome: 'found',
-  meta: { isOwner, isPublic: false, publishedAt: null, generationComplete: true },
+  meta: {
+    isOwner,
+    isPublic: false,
+    publishedAt: null,
+    generationComplete: true,
+    guestQuiz: false,
+    guestTts: false,
+    guestChat: false,
+    guestPbl: false,
+    guestLocalRecords: true,
+  },
 });
 
 describe('resolveCourseAccess', () => {
