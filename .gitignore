@@ -108,3 +108,6 @@ render-service/.owner-bound-parent-*/
 
 # Local forced-child eval results
 eval/orchestration/results-child-failure/
+
+# Superpowers design docs and plans (local only)
+docs/superpowers/
