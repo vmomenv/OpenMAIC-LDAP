@@ -151,6 +151,10 @@ Active Directory 请使用 `LDAP_USER_FILTER=(sAMAccountName={username})` 和
 - 保持 `OWNER_ANONYMOUS_PREMINT=false`，避免页面响应为每个浏览器铸造匿名所有者。
 - `ACCESS_CODE` 可选，会在 LDAP 前再加一道站点级密码；只用 LDAP 时留空。
 - 登录和退出入口：`/login`、`POST /api/auth/login`、`POST /api/auth/logout`。
+- 访客访问：课程所有者在课堂页右上角下载菜单的 **访客权限** 子菜单里开启“分享（发布）”，
+  拿到课堂链接或扫描导出 PPTX 里的二维码的人即可无需 LDAP 登录进入。发布后默认只允许
+  浏览课堂和把访客记录保存在其浏览器本地；测验、语音、AI 对话、PBL 需要教师逐项勾选。
+  取消“分享（发布）”后链接恢复为跳登录页。PBL 为服务端访客分区，其余学习记录只存本地。
 - Docker 部署时，`NEXT_PUBLIC_LDAP_ENABLED` 还是**构建参数**：执行
   `docker compose up --build` 前，在 shell 或 `docker-compose.yml` 同目录的 `.env`
   中设置 `NEXT_PUBLIC_LDAP_ENABLED=true`。`.env.local` 中也要保持为 `true`，

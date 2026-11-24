@@ -157,6 +157,13 @@ Notes:
   Leave it unset when LDAP is the only gate.
 - Sign-in and sign-out live at `/login`, `POST /api/auth/login` and
   `POST /api/auth/logout`.
+- Visitor access: the course owner opens **Visitor access → Share (publish)** in
+  the classroom's download menu, and anyone with the classroom link or the QR
+  code in an exported PPTX can enter without an LDAP account. Publishing
+  defaults to viewing plus visitor records kept in the visitor's browser; quiz,
+  narration, AI chat and PBL are opt-in per course. Unsharing returns the link
+  to the sign-in page. PBL uses an isolated server-side visitor partition; all
+  other visitor records stay local.
 - For Docker, `NEXT_PUBLIC_LDAP_ENABLED` is also a **build argument**: set it to
   `true` in the shell or the `.env` file next to `docker-compose.yml` before
   `docker compose up --build`. Keep it `true` in `.env.local` as well, together
