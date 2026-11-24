@@ -3485,5 +3485,19 @@
     "me": "我",
     "listening": "旁听中",
     "whiteboardTitle": "课堂白板"
+  },
+  "guestAccess": {
+    "menu": "访客权限",
+    "menuDesc": "分享与匿名访问",
+    "share": "分享（发布）",
+    "shareHint": "拿到课堂链接的人无需登录即可进入。",
+    "quiz": "允许匿名测验",
+    "tts": "允许匿名语音朗读",
+    "chat": "允许匿名 AI 对话",
+    "pbl": "允许匿名 PBL",
+    "localRecords": "访客记录保存到本地浏览器",
+    "localRecordsHint": "关闭后，访客刷新页面会丢失进度。",
+    "copyLink": "复制课堂链接",
+    "copied": "已复制"
   }
 }

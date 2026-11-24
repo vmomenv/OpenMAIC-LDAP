@@ -179,7 +179,10 @@ describe('classroom surfaces feed the sidecar into the gate', () => {
   });
 
   it('the standalone route mounts the shared page variant', () => {
-    const source = readFileSync(join(process.cwd(), 'app/classroom/[id]/page.tsx'), 'utf8');
+    const source = readFileSync(
+      join(process.cwd(), 'app/classroom/[id]/classroom-page.tsx'),
+      'utf8',
+    );
     expect(source).toContain('import { ClassroomSurface }');
     expect(source).toContain('variant="page"');
   });

@@ -3485,5 +3485,19 @@
     "me": "Eu",
     "listening": "Ouvindo",
     "whiteboardTitle": "Quadro da aula"
+  },
+  "guestAccess": {
+    "menu": "Visitor access",
+    "menuDesc": "Share and anonymous access",
+    "share": "Share (publish)",
+    "shareHint": "Anyone with the classroom link can enter without signing in.",
+    "quiz": "Allow anonymous quizzes",
+    "tts": "Allow anonymous narration",
+    "chat": "Allow anonymous AI chat",
+    "pbl": "Allow anonymous PBL",
+    "localRecords": "Keep visitor records in this browser",
+    "localRecordsHint": "When off, a visitor loses progress on reload.",
+    "copyLink": "Copy classroom link",
+    "copied": "Copied"
   }
 }

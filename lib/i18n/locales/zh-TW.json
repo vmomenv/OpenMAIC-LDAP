@@ -3485,5 +3485,19 @@
     "me": "我",
     "listening": "旁聽中",
     "whiteboardTitle": "課堂白板"
+  },
+  "guestAccess": {
+    "menu": "訪客權限",
+    "menuDesc": "分享與匿名存取",
+    "share": "分享（發布）",
+    "shareHint": "取得課堂連結的人無需登入即可進入。",
+    "quiz": "允許匿名測驗",
+    "tts": "允許匿名語音朗讀",
+    "chat": "允許匿名 AI 對話",
+    "pbl": "允許匿名 PBL",
+    "localRecords": "訪客記錄儲存在本機瀏覽器",
+    "localRecordsHint": "關閉後，訪客重新整理頁面會遺失進度。",
+    "copyLink": "複製課堂連結",
+    "copied": "已複製"
   }
 }

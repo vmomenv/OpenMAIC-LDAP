@@ -33,6 +33,7 @@ import { isWorkbenchEnabled } from '@/lib/config/feature-flags';
 import { useVideoRenderStore } from '@/lib/store/video-render';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { VideoExportDialog } from './video-export-dialog';
+import { GuestAccessSubmenu } from './guest-access-menu';
 import { LanguageSwitcher } from '../language-switcher';
 import { SettingsDialog } from '../settings';
 import {
@@ -155,6 +156,7 @@ export function HeaderControls({
   const generatingOutlines = useStageStore((s) => s.generatingOutlines);
   const failedOutlines = useStageStore((s) => s.failedOutlines);
   const isOwner = useStageStore((s) => s.isOwner);
+  const stageId = useStageStore((s) => s.stage?.id);
   const mediaTasks = useMediaGenerationStore((s) => s.tasks);
   const { exporting: isExporting, exportPPTX, exportResourcePack } = useExportPPTX();
   const { exporting: isExportingZip, exportClassroomZip } = useExportClassroom();
@@ -390,6 +392,7 @@ export function HeaderControls({
             />
           </DropdownMenuSubContent>
         </DropdownMenuSub>
+        <GuestAccessSubmenu stageId={stageId} isOwner={isOwner} canExport={canExport} />
         {videoExportEnabled && (
           <ExportMenuItem
             disabled={!canExport}

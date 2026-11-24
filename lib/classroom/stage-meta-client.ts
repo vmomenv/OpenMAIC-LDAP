@@ -20,6 +20,11 @@ export interface StageMetaView {
   isPublic: boolean;
   publishedAt: number | null;
   generationComplete: boolean;
+  guestQuiz: boolean;
+  guestTts: boolean;
+  guestChat: boolean;
+  guestPbl: boolean;
+  guestLocalRecords: boolean;
   /** Which layer answered. Diagnostic only — nothing may branch on it. */
   source?: string;
 }
@@ -56,6 +61,11 @@ export async function fetchStageMeta(
         isPublic: body.isPublic === true,
         publishedAt: typeof body.publishedAt === 'number' ? body.publishedAt : null,
         generationComplete: body.generationComplete === true,
+        guestQuiz: body.guestQuiz === true,
+        guestTts: body.guestTts === true,
+        guestChat: body.guestChat === true,
+        guestPbl: body.guestPbl === true,
+        guestLocalRecords: body.guestLocalRecords === true,
         ...(typeof body.source === 'string' ? { source: body.source } : {}),
       },
     };
