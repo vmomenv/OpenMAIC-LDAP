@@ -68,6 +68,11 @@ export async function GET(req: NextRequest, { params }: Params) {
           isPublic: access.isPublic,
           publishedAt: access.publishedAt,
           generationComplete: access.generationComplete,
+          guestQuiz: access.guestQuiz,
+          guestTts: access.guestTts,
+          guestChat: access.guestChat,
+          guestPbl: access.guestPbl,
+          guestLocalRecords: access.guestLocalRecords,
           // Which layer answered. Diagnostic only — the client must not branch
           // on it.
           source: access.source,

@@ -63,6 +63,11 @@ beforeEach(() => {
     meta_is_public: false,
     meta_published_at: null,
     meta_generation_complete: false,
+    meta_guest_quiz: false,
+    meta_guest_tts: false,
+    meta_guest_chat: false,
+    meta_guest_pbl: false,
+    meta_guest_local_records: true,
     meta_deleted_at: null,
     document_name: 'Course',
   };
@@ -81,6 +86,11 @@ describe('GET /api/stage-meta/[stageId]', () => {
       isPublic: false,
       publishedAt: null,
       generationComplete: false,
+      guestQuiz: false,
+      guestTts: false,
+      guestChat: false,
+      guestPbl: false,
+      guestLocalRecords: true,
       source: 'document',
     });
   });

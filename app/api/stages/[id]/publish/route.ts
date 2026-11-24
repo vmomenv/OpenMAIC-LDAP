@@ -46,9 +46,17 @@ export async function POST(req: NextRequest, { params }: Params) {
         return NextResponse.json({ error: 'forbidden' }, { status: 403, headers: responseHeaders });
       }
 
+      const permissions = {
+        guestQuiz: access.guestQuiz,
+        guestTts: access.guestTts,
+        guestChat: access.guestChat,
+        guestPbl: access.guestPbl,
+        guestLocalRecords: access.guestLocalRecords,
+      };
+
       if (access.isPublic) {
         return NextResponse.json(
-          { success: true, publishedAt: access.publishedAt, name: access.name },
+          { success: true, publishedAt: access.publishedAt, name: access.name, permissions },
           { status: 200, headers: responseHeaders },
         );
       }
@@ -59,7 +67,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
       console.info('Stage published', { stageId, ownerId });
       return NextResponse.json(
-        { success: true, publishedAt, name: access.name },
+        { success: true, publishedAt, name: access.name, permissions },
         { status: 200, headers: responseHeaders },
       );
     } catch (error) {
