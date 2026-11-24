@@ -99,6 +99,7 @@ async function foreignReadablePrincipal(
   queryable: OwnerAssetQueryable,
   ref: string,
   callerKey: string,
+  requirePublicCourse = false,
 ): Promise<string | undefined> {
   if (!isQueryableId(ref)) return undefined;
   const result = await queryable.query(
@@ -117,11 +118,18 @@ async function foreignReadablePrincipal(
                 JOIN stage_meta m ON m.stage_id = r.stage_id
                WHERE r.asset_id = e.id
                  AND m.deleted_at IS NULL
+                 AND ($5 = false OR m.is_public)
                  AND e.principal = $4 || m.owner_id
             )
           )
         )`,
-    [ref, callerKey, LEGACY_SHARED_ASSET_PRINCIPAL, OWNER_ASSET_PRINCIPAL_PREFIX],
+    [
+      ref,
+      callerKey,
+      LEGACY_SHARED_ASSET_PRINCIPAL,
+      OWNER_ASSET_PRINCIPAL_PREFIX,
+      requirePublicCourse,
+    ],
   );
   const row = result.rows[0] as { principal?: unknown } | undefined;
   return typeof row?.principal === 'string' ? row.principal : undefined;
@@ -210,6 +218,13 @@ export interface OwnerAssetStoreOptions {
    * shared, so uploads never wait for each other.
    */
   transactions?: OwnerAssetTransactions;
+  /**
+   * Anonymous classroom visitors may read another owner's committed asset only
+   * when the referencing course is published. Account owners keep the existing
+   * capability-by-id rule (`is_public` is not required), so a viewer who signs
+   * in still sees the media of any course whose id they hold.
+   */
+  foreignReadRequiresPublicCourse?: boolean;
 }
 
 /**
@@ -222,7 +237,7 @@ export function createOwnerAssetStore(
   inner: AssetStore,
   options: OwnerAssetStoreOptions,
 ): AssetStore {
-  const { ownerId, queryable, transactions } = options;
+  const { ownerId, queryable, transactions, foreignReadRequiresPublicCourse = false } = options;
 
   /**
    * Run `mutate` under the principal the caller may mutate `ref` as, or return
@@ -254,7 +269,12 @@ export function createOwnerAssetStore(
   ): Promise<T | null> {
     const own = await read(principal);
     if (own !== null) return own;
-    const foreign = await foreignReadablePrincipal(queryable, ref, principal.key);
+    const foreign = await foreignReadablePrincipal(
+      queryable,
+      ref,
+      principal.key,
+      foreignReadRequiresPublicCourse,
+    );
     return foreign === undefined ? null : read({ key: foreign });
   }
 
@@ -300,7 +320,12 @@ export function createOwnerAssetStore(
       const own = await resolveIndirect(principal, ref, request);
       // `undefined` is "this byte layer cannot sign", independent of the entry.
       if (own !== null) return own;
-      const foreign = await foreignReadablePrincipal(queryable, ref, principal.key);
+      const foreign = await foreignReadablePrincipal(
+      queryable,
+      ref,
+      principal.key,
+      foreignReadRequiresPublicCourse,
+    );
       return foreign === undefined ? null : resolveIndirect({ key: foreign }, ref, request);
     };
   }

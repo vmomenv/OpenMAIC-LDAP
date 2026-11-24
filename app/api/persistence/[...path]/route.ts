@@ -40,6 +40,7 @@ import {
 } from '@/lib/persistence/server-provider';
 import { readStageMeta } from '@/lib/persistence/stage-meta';
 import { APP_RUNTIME_PAYLOAD_VALIDATORS } from '@/lib/runtime/payload-validators';
+import { isClassroomGuest } from '@/lib/server/identity/classroom-guest/access';
 import type { OwnerPrincipal } from '@/lib/server/identity/types';
 import { withRequestOwner } from '@/lib/server/identity/with-owner';
 import { getPersistenceHooks } from '@/lib/server/persistence-hooks/registry';
@@ -321,6 +322,9 @@ async function createPersistenceHandler(
       ownerId,
       queryable: pool,
       transactions: { withTransaction, storeIn: assetStoreIn },
+      // Anonymous visitors may read a course's media only while that course is
+      // published; account owners keep the capability-by-id rule.
+      foreignReadRequiresPublicCourse: isClassroomGuest(principal),
     }),
     ...(byteEgress === undefined ? {} : { byteEgress }),
   });
@@ -522,6 +526,24 @@ async function handlePersistenceRequestInner(
       if (path === LEARNER_MERGE_PATH && request.method === 'POST') {
         return await handleLearnerMerge(request, principal, responseHeaders);
       }
+      const guest = isClassroomGuest(principal);
+      // A classroom visitor reads a published course; they never change a
+      // course or an asset. Runtime writes stay on their own anonymous
+      // partition (the local record store normally handles those in the
+      // browser, but PBL keeps server state).
+      if (
+        guest &&
+        !READ_METHODS.has(request.method) &&
+        (path === '/documents' ||
+          path.startsWith('/documents/') ||
+          path === '/assets' ||
+          path.startsWith('/assets/'))
+      ) {
+        return withHeaders(
+          jsonError(403, 'FORBIDDEN', 'anonymous classroom visitors cannot modify courses'),
+          responseHeaders,
+        );
+      }
       // A request that still presents an identity a claim retired writes
       // nothing: its work lives in the account now. What makes that exact is
       // the fence inside every create transaction (documents, folders, asset
@@ -550,6 +572,7 @@ async function handlePersistenceRequestInner(
               .query('SELECT 1 FROM document_stages WHERE id = $1', [stageId])
               .then((result) => result.rows.length > 0),
           (stageId) => readStageMeta(queryable, stageId),
+          { publicOnlyRead: guest },
         );
       }
 

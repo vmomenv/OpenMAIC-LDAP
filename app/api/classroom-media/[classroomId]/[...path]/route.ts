@@ -7,6 +7,12 @@ import {
   isValidClassroomId,
 } from '@/lib/server/classroom-storage';
 import { parseRangeHeader } from '@/lib/server/http-range';
+import { isGuestRequest, readGuestOwner } from '@/lib/server/identity/classroom-guest/cookies';
+import {
+  hasLiveLdapSession,
+  isStageReadableByGuest,
+} from '@/lib/server/identity/classroom-guest/access';
+import { ldapEnabled } from '@/lib/server/identity/ldap/config';
 import { readStageAccessIncludingDeleted } from '@/lib/server/stage-access';
 import { createLogger } from '@/lib/logger';
 
@@ -43,6 +49,21 @@ export async function GET(
       { error: 'Invalid classroom ID' },
       { status: 400, headers: ERROR_CACHE_HEADERS },
     );
+  }
+
+  // In an LDAP deployment this route is also the anonymous classroom's media
+  // surface: a guest may read a published course's media only, and anything
+  // else answers as an unknown id.
+  if (ldapEnabled() && !hasLiveLdapSession(req.headers)) {
+    if (!isGuestRequest(req.headers) || !readGuestOwner(req.headers)) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401, headers: ERROR_CACHE_HEADERS },
+      );
+    }
+    if (!(await isStageReadableByGuest(classroomId))) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404, headers: ERROR_CACHE_HEADERS });
+    }
   }
 
   // Validate path segments — no traversal

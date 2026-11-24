@@ -12,6 +12,15 @@ export type DocumentAccess = 'allow' | 'forbid' | 'not-found';
 export type StageMetaReader = (stageId: string) => Promise<StageMetaRow | null>;
 export type DocumentExistenceReader = (stageId: string) => Promise<boolean>;
 
+export interface DocumentAccessOptions {
+  /**
+   * Anonymous classroom visitors may read only published courses. Account
+   * owners keep the capability-by-id model (a link is the capability), so this
+   * is off for them.
+   */
+  readonly publicOnlyRead?: boolean;
+}
+
 const LONE_SURROGATE = /[\uD800-\uDFFF]/u;
 
 /**
@@ -65,6 +74,7 @@ export async function decideDocumentAccess(
   readMeta: StageMetaReader,
   documentExists: DocumentExistenceReader,
   rereadMeta: StageMetaReader = readMeta,
+  options: DocumentAccessOptions = {},
 ): Promise<DocumentAccess> {
   if (!ownerId) return 'forbid';
   switch (action.kind) {
@@ -74,7 +84,9 @@ export async function decideDocumentAccess(
     case 'read': {
       const meta = await readMeta(action.stageId);
       if (!meta) return 'not-found';
-      return meta.deletedAt === null ? 'allow' : 'not-found';
+      if (meta.deletedAt !== null) return 'not-found';
+      if (options.publicOnlyRead && !meta.isPublic) return 'not-found';
+      return 'allow';
     }
     case 'write': {
       const meta = await readMeta(action.stageId);
