@@ -167,6 +167,9 @@
     "videoQueueFull": "渲染佇列繁忙，請稍後再試。",
     "videoRenderInProgress": "已有渲染工作正在進行，請稍後再試。",
     "videoTooLarge": "匯出檔案超過服務允許的大小。",
+    "videoUploading": "正在上傳影片專案...",
+    "videoQueued": "排隊等待轉檔...",
+    "videoQueuePosition": "排隊中，第 {{position}} 位",
     "videoWarnings": "影片警告：缺少 {{assets}} 個素材，匯出報告有 {{diagnostics}} 個問題。",
     "videoMp4Success": "MP4 影片已就緒",
     "videoServiceUnavailable": "未設定渲染服務 — 已下載專案 ZIP 供本機渲染。",
@@ -805,7 +808,11 @@
     "restore": "恢復",
     "noHistory": "暫無歷史紀錄",
     "restored": "已恢復白板內容",
-    "elementCount": "{{count}} 個元素"
+    "elementCount": "{{count}} 個元素",
+    "mobileEmpty": "老師還沒有新增板書",
+    "mobileEmptyHint": "老師補充的推導、公式和圖示會顯示在這裡",
+    "zoomIn": "放大板書",
+    "zoomOut": "縮小板書"
   },
   "quiz": {
     "title": "課堂小測",
@@ -1836,6 +1843,9 @@
       "title": "Token Plan 一鍵設定",
       "desc": "選擇你的 Token Plan 服務商並填入金鑰，將自動設定所有已適配的模態（語言模型/影像/影片/語音/網路搜尋/網頁擷取）。",
       "selectPlan": "選擇服務商",
+      "region": "服務區域",
+      "regionHintDomestic": "適用於國內站帳號",
+      "regionHintInternational": "適用於海外站帳號",
       "apiKey": "API 金鑰",
       "updateKey": "更新金鑰",
       "modelsCount": "{{n}} 個模型",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "解析 PDF 和圖片需要 MinerU 伺服器安裝 mineru[pipeline] 或 mineru[core] 相依套件。輕量版 mineru-api 可能僅支援 Office 文件。",
     "modelId": "模型ID",
     "modelIdPlaceholder": "例如：gpt-4o",
+    "contextWindowTokens": "上下文視窗（tokens）",
+    "contextWindowTokensPlaceholder": "例如：1000000",
+    "contextWindowHint": "可選。僅對內建目錄不認識的模型生效，供壓縮與上下文預算檢查使用；留空則使用預設值。",
+    "contextWindowInvalid": "請輸入正整數 token 數，或留空。",
     "modelSelectedViaVoice": "模型隨聲線選擇自動確定",
     "modelServices": {
       "configured": "已設定",
@@ -2008,7 +2022,7 @@
       "international": "海外"
     },
     "providerName": "名稱",
-    "providerNamePlaceholder": "例如：我的OpenAI代理",
+    "providerNamePlaceholder": "例如：my-relay",
     "providers": "語言模型",
     "requestUrl": "請求位址",
     "reset": "重設",
@@ -2055,10 +2069,11 @@
       "showKey": "顯示金鑰",
       "hideKey": "隱藏金鑰",
       "inUse": "使用中",
-      "modelFromCatalogue": "模型名稱、能力與上下文視窗來自內建目錄。",
+      "modelFromCatalogue": "模型名稱與能力來自內建目錄。",
       "modelWhenInUse": "在「課程模型設定」中選用此服務後生效。",
       "planServer": "由伺服器設定",
       "providerIdHint": "儲存為「{{id}}」",
+      "providerNameNeedsLatin": "名稱需包含英文字母或數字，否則無法轉換為 id 儲存。",
       "openaiCompatible": "OpenAI 相容",
       "notNarration": "此服務不是目前工作區的旁白語音。",
       "useForNarration": "用作旁白語音",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "開始編輯"
+    },
+    "mobile": {
+      "openMenu": "開啟導覽",
+      "closeMenu": "關閉導覽"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "關閉指引"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "聲音設定",
+    "playSound": "播放聲音",
+    "materials": "課堂資料",
+    "classroom": "課堂",
+    "directory": "目錄",
+    "lecture": "筆記",
+    "volume": "音量",
+    "mute": "靜音",
+    "roundtable": "圓桌成員",
+    "captions": "字幕",
+    "controls": "播放控制",
+    "send": "傳送",
+    "join": "加入",
+    "skip": "略過",
+    "play": "播放",
+    "pause": "暫停",
+    "pblDesktop": "暫不支援預覽，請用電腦開啟體驗",
+    "chat": "聊天",
+    "askTeacher": "向老師提問…",
+    "viewInNotes": "在筆記中查看",
+    "viewInChat": "在聊天中查看",
+    "fullSpeech": "完整發言",
+    "me": "我",
+    "listening": "旁聽中",
+    "whiteboardTitle": "課堂白板"
   }
 }

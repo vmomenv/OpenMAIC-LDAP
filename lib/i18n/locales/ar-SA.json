@@ -167,6 +167,9 @@
     "videoQueueFull": "قائمة انتظار التصيير مشغولة. يُرجى المحاولة مجددًا بعد قليل.",
     "videoRenderInProgress": "هناك عملية تصيير قيد التنفيذ بالفعل. يُرجى المحاولة مجددًا بعد قليل.",
     "videoTooLarge": "يتجاوز حجم أرشيف التصدير الحد المسموح به في الخدمة.",
+    "videoUploading": "جارٍ تحميل مشروع الفيديو...",
+    "videoQueued": "في انتظار قائمة التصيير...",
+    "videoQueuePosition": "في الطابور، الموضع {{position}}",
     "videoWarnings": "{{assets}} من الموارد مفقودة و {{diagnostics}} من المشكلات في تقرير التصدير.",
     "videoMp4Success": "تم عرض الفيديو",
     "videoServiceUnavailable": "خدمة العرض غير مُهيأة — تم تنزيل ملف ZIP للمشروع للعرض محليًا.",
@@ -805,7 +808,11 @@
     "restore": "استعادة",
     "noHistory": "لا يوجد سجل بعد",
     "restored": "تمت استعادة السبورة",
-    "elementCount": "{{count}} عنصر"
+    "elementCount": "{{count}} عنصر",
+    "mobileEmpty": "لا توجد ملاحظات على السبورة بعد",
+    "mobileEmptyHint": "ستظهر هنا الاشتقاقات والمعادلات والرسوم التي يضيفها المعلم",
+    "zoomIn": "تكبير",
+    "zoomOut": "تصغير"
   },
   "quiz": {
     "title": "اختبار",
@@ -1836,6 +1843,9 @@
       "title": "Token Plan Setup",
       "desc": "Pick your token plan provider and enter the key — it auto-configures every adapted modality (LLM/image/video/speech/web search/web fetch).",
       "selectPlan": "Select Provider",
+      "region": "المنطقة",
+      "regionHintDomestic": "لحسابات موقع البر الرئيسي الصيني",
+      "regionHintInternational": "لحسابات الموقع الدولي",
       "apiKey": "API Key",
       "updateKey": "Update key",
       "modelsCount": "{{n}} models",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "يتطلب تحليل ملفات PDF والصور تثبيت الإضافات mineru[pipeline] أو mineru[core] على خادم MinerU. قد تدعم عمليات تثبيت mineru-api الخفيفة مستندات Office فقط.",
     "modelId": "معرّف النموذج",
     "modelIdPlaceholder": "مثلاً، gpt-4o",
+    "contextWindowTokens": "نافذة السياق (رموز)",
+    "contextWindowTokensPlaceholder": "مثلاً، 1000000",
+    "contextWindowHint": "اختياري. ينطبق فقط على النماذج التي لا يعرفها الكتالوج المدمج؛ يُستخدم في الضغط والتحقق من ميزانية السياق. اتركه فارغاً للقيمة الافتراضية.",
+    "contextWindowInvalid": "أدخل عدداً صحيحاً موجباً من الرموز، أو اتركه فارغاً.",
     "modelSelectedViaVoice": "يتم تحديد النموذج حسب اختيار الصوت",
     "modelServices": {
       "configured": "مهيّأ",
@@ -2008,7 +2022,7 @@
       "international": "دولي"
     },
     "providerName": "الاسم",
-    "providerNamePlaceholder": "مثلاً: بروكسي OpenAI الخاص بي",
+    "providerNamePlaceholder": "مثلاً، my-relay",
     "providers": "LLM",
     "requestUrl": "عنوان الطلب",
     "reset": "إعادة تعيين",
@@ -2055,10 +2069,11 @@
       "showKey": "إظهار المفتاح",
       "hideKey": "إخفاء المفتاح",
       "inUse": "قيد الاستخدام",
-      "modelFromCatalogue": "يأتي اسم النموذج وقدراته ونافذة السياق من الكتالوج المدمج.",
+      "modelFromCatalogue": "يأتي اسم النموذج وقدراته من الكتالوج المدمج.",
       "modelWhenInUse": "يُستخدم عند اختيار هذه الخدمة في إعدادات نماذج الدورة.",
       "planServer": "مهيأ من الخادم",
       "providerIdHint": "يُحفظ باسم \"{{id}}\"",
+      "providerNameNeedsLatin": "يجب أن يحتوي الاسم على حرف لاتيني (a–z) أو رقم واحد على الأقل حتى يُحفظ كمعرّف.",
       "openaiCompatible": "متوافق مع OpenAI",
       "notNarration": "هذه الخدمة ليست صوت السرد لمساحة العمل.",
       "useForNarration": "استخدامها للسرد",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "ابدأ التحرير"
+    },
+    "mobile": {
+      "openMenu": "فتح التنقل",
+      "closeMenu": "إغلاق التنقل"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "إغلاق الدليل"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "إعدادات الصوت",
+    "playSound": "تشغيل الصوت",
+    "materials": "مواد الدرس",
+    "classroom": "الصف",
+    "directory": "المحتويات",
+    "lecture": "ملاحظات",
+    "volume": "مستوى الصوت",
+    "mute": "كتم الصوت",
+    "roundtable": "المشاركون",
+    "captions": "الترجمة",
+    "controls": "عناصر التشغيل",
+    "send": "إرسال",
+    "join": "انضمام",
+    "skip": "تخطي",
+    "play": "تشغيل",
+    "pause": "إيقاف مؤقت",
+    "pblDesktop": "المعاينة غير متاحة على الهاتف. افتح هذا المشروع على جهاز كمبيوتر لتجربته.",
+    "chat": "محادثة",
+    "askTeacher": "اسأل المعلم…",
+    "viewInNotes": "عرض في الملاحظات",
+    "viewInChat": "عرض في المحادثة",
+    "fullSpeech": "الرسالة كاملة",
+    "me": "أنا",
+    "listening": "يستمع",
+    "whiteboardTitle": "سبورة الدرس"
   }
 }

@@ -167,6 +167,9 @@
     "videoQueueFull": "Hàng đợi kết xuất đang bận. Vui lòng thử lại sau ít phút.",
     "videoRenderInProgress": "Đã có tác vụ kết xuất đang chạy. Vui lòng thử lại sau ít phút.",
     "videoTooLarge": "Tệp xuất vượt quá giới hạn kích thước của dịch vụ.",
+    "videoUploading": "Đang tải dự án video lên...",
+    "videoQueued": "Đang xếp hàng chờ kết xuất...",
+    "videoQueuePosition": "Trong hàng đợi, vị trí {{position}}",
     "videoWarnings": "Thiếu {{assets}} tài nguyên và có {{diagnostics}} vấn đề trong báo cáo xuất.",
     "videoMp4Success": "Đã kết xuất video",
     "videoServiceUnavailable": "Chưa cấu hình dịch vụ kết xuất — đã tải về tệp ZIP dự án để bạn kết xuất tại máy.",
@@ -805,7 +808,11 @@
     "restore": "Phục hồi",
     "noHistory": "Chưa có lịch sử",
     "restored": "Đã phục hồi bảng",
-    "elementCount": "{{count}} phần tử"
+    "elementCount": "{{count}} phần tử",
+    "mobileEmpty": "Chưa có nội dung trên bảng",
+    "mobileEmptyHint": "Các bước suy luận, công thức và sơ đồ giáo viên thêm sẽ hiển thị ở đây",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Thu nhỏ"
   },
   "quiz": {
     "title": "Câu đố",
@@ -1836,6 +1843,9 @@
       "title": "Thiết lập gói token",
       "desc": "Chọn nhà cung cấp gói token và nhập khóa — hệ thống sẽ tự cấu hình mọi loại nội dung tương thích (model ngôn ngữ / ảnh / video / giọng nói / tìm web / lấy trang web).",
       "selectPlan": "Chọn nhà cung cấp",
+      "region": "Khu vực",
+      "regionHintDomestic": "Dành cho tài khoản trên trang Trung Quốc đại lục",
+      "regionHintInternational": "Dành cho tài khoản trên trang quốc tế",
       "apiKey": "Khóa API",
       "updateKey": "Cập nhật khóa",
       "modelsCount": "{{n}} model",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "Việc bóc tách PDF và ảnh cần bản mineru[pipeline] hoặc mineru[core] trên máy chủ MinerU của bạn. Bản mineru-api gọn nhẹ có thể chỉ xử lý được tài liệu Office.",
     "modelId": "Mã model",
     "modelIdPlaceholder": "ví dụ: gpt-4o",
+    "contextWindowTokens": "Cửa sổ ngữ cảnh (token)",
+    "contextWindowTokensPlaceholder": "vd: 1000000",
+    "contextWindowHint": "Tùy chọn. Chỉ áp dụng cho mô hình mà danh mục tích hợp không biết; dùng cho nén và kiểm tra ngân sách ngữ cảnh. Để trống sẽ dùng giá trị mặc định.",
+    "contextWindowInvalid": "Nhập số nguyên dương token, hoặc để trống.",
     "modelSelectedViaVoice": "Model được xác định theo giọng đã chọn",
     "modelServices": {
       "configured": "Đã cấu hình",
@@ -2008,7 +2022,7 @@
       "international": "Quốc tế"
     },
     "providerName": "Tên",
-    "providerNamePlaceholder": "ví dụ: Proxy OpenAI của tôi",
+    "providerNamePlaceholder": "ví dụ: my-relay",
     "providers": "Model ngôn ngữ",
     "requestUrl": "Địa chỉ yêu cầu",
     "reset": "Đặt lại",
@@ -2055,10 +2069,11 @@
       "showKey": "Hiện khóa",
       "hideKey": "Ẩn khóa",
       "inUse": "Đang dùng",
-      "modelFromCatalogue": "Tên, khả năng và cửa sổ ngữ cảnh của mô hình lấy từ danh mục tích hợp.",
+      "modelFromCatalogue": "Tên và khả năng của mô hình lấy từ danh mục tích hợp.",
       "modelWhenInUse": "Được dùng khi dịch vụ này được chọn trong cấu hình mô hình khóa học.",
       "planServer": "Do máy chủ cấu hình",
       "providerIdHint": "Lưu với tên \"{{id}}\"",
+      "providerNameNeedsLatin": "Tên cần có ít nhất một chữ cái a–z hoặc chữ số để được lưu làm ID.",
       "openaiCompatible": "Tương thích OpenAI",
       "notNarration": "Dịch vụ này không phải giọng thuyết minh của không gian làm việc.",
       "useForNarration": "Dùng cho thuyết minh",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "Bắt đầu sửa"
+    },
+    "mobile": {
+      "openMenu": "Mở điều hướng",
+      "closeMenu": "Đóng điều hướng"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "Đóng hướng dẫn"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "Cài đặt âm thanh",
+    "playSound": "Phát âm thanh",
+    "materials": "Tài liệu lớp học",
+    "classroom": "Lớp học",
+    "directory": "Mục lục",
+    "lecture": "Ghi chú",
+    "volume": "Âm lượng",
+    "mute": "Tắt tiếng",
+    "roundtable": "Người tham gia",
+    "captions": "Phụ đề",
+    "controls": "Điều khiển phát",
+    "send": "Gửi",
+    "join": "Tham gia",
+    "skip": "Bỏ qua",
+    "play": "Phát",
+    "pause": "Tạm dừng",
+    "pblDesktop": "Chưa hỗ trợ xem trước trên điện thoại. Hãy mở dự án trên máy tính để trải nghiệm.",
+    "chat": "Trò chuyện",
+    "askTeacher": "Hỏi giáo viên…",
+    "viewInNotes": "Xem trong ghi chú",
+    "viewInChat": "Xem trong trò chuyện",
+    "fullSpeech": "Phát biểu đầy đủ",
+    "me": "Tôi",
+    "listening": "Đang nghe",
+    "whiteboardTitle": "Bảng lớp học"
   }
 }

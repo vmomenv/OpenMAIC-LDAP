@@ -167,6 +167,9 @@
     "videoQueueFull": "渲染队列繁忙，请稍后重试。",
     "videoRenderInProgress": "已有渲染任务正在进行，请稍后重试。",
     "videoTooLarge": "导出文件超过服务允许的大小。",
+    "videoUploading": "正在上传视频工程...",
+    "videoQueued": "排队等待渲染...",
+    "videoQueuePosition": "排队中，第 {{position}} 位",
     "videoWarnings": "有 {{assets}} 个素材缺失，导出报告中有 {{diagnostics}} 个问题。",
     "videoMp4Success": "视频已渲染",
     "videoServiceUnavailable": "未配置渲染服务 —— 已下载项目 ZIP 供本地渲染。",
@@ -805,7 +808,11 @@
     "restore": "恢复",
     "noHistory": "暂无历史记录",
     "restored": "已恢复白板内容",
-    "elementCount": "{{count}} 个元素"
+    "elementCount": "{{count}} 个元素",
+    "mobileEmpty": "老师还没有添加板书",
+    "mobileEmptyHint": "老师补充的推导、公式和图示会显示在这里",
+    "zoomIn": "放大板书",
+    "zoomOut": "缩小板书"
   },
   "quiz": {
     "title": "随堂测验",
@@ -1530,8 +1537,8 @@
     "voiceBaseUrlRequired": "需要 Base URL",
     "ttsTestTextPlaceholder": "输入要转换的文本",
     "ttsTestTextDefault": "你好，这是一段测试语音。",
-    "recording": "录音中...",
-    "transcribing": "识别中...",
+    "recording": "正在录音",
+    "transcribing": "正在识别",
     "transcriptionResult": "识别结果",
     "noTranscriptionResult": "无识别结果",
     "baseUrlOptional": "Base URL（可选）",
@@ -1836,6 +1843,9 @@
       "title": "Token Plan 一键配置",
       "desc": "选择你的 Token Plan 服务商并填入密钥，将自动配置所有已适配的模态(语言模型/图像/视频/语音/网络搜索/网页抓取)。",
       "selectPlan": "选择服务商",
+      "region": "服务区域",
+      "regionHintDomestic": "适用于国内站账号",
+      "regionHintInternational": "适用于海外站账号",
       "apiKey": "API 密钥",
       "updateKey": "更新密钥",
       "modelsCount": "{{n}} 个模型",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "解析 PDF 和图片需要 MinerU 服务器安装 mineru[pipeline] 或 mineru[core] 依赖。轻量版 mineru-api 可能仅支持 Office 文档。",
     "modelId": "模型ID",
     "modelIdPlaceholder": "例如：gpt-4o",
+    "contextWindowTokens": "上下文窗口（tokens）",
+    "contextWindowTokensPlaceholder": "例如：1000000",
+    "contextWindowHint": "可选。仅对内置目录不认识的模型生效，供压缩与上下文预算检查使用；留空则使用默认值。",
+    "contextWindowInvalid": "请输入正整数 token 数，或留空。",
     "modelSelectedViaVoice": "模型随音色选择自动确定",
     "modelServices": {
       "configured": "已配置",
@@ -2008,7 +2022,7 @@
       "international": "海外"
     },
     "providerName": "名称",
-    "providerNamePlaceholder": "例如：我的OpenAI代理",
+    "providerNamePlaceholder": "例如：my-relay",
     "providers": "语言模型",
     "requestUrl": "请求地址",
     "reset": "重置",
@@ -2055,10 +2069,11 @@
       "showKey": "显示密钥",
       "hideKey": "隐藏密钥",
       "inUse": "使用中",
-      "modelFromCatalogue": "模型名称、能力与上下文窗口来自内置目录。",
+      "modelFromCatalogue": "模型名称与能力来自内置目录。",
       "modelWhenInUse": "在「课程模型配置」中选用此服务后生效。",
       "planServer": "由服务器配置",
       "providerIdHint": "保存为「{{id}}」",
+      "providerNameNeedsLatin": "名称需包含英文字母或数字，否则无法转换为 id 保存。",
       "openaiCompatible": "OpenAI 兼容",
       "notNarration": "此服务不是当前工作区的旁白语音。",
       "useForNarration": "用作旁白语音",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "开始编辑"
+    },
+    "mobile": {
+      "openMenu": "打开导航",
+      "closeMenu": "关闭导航"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "关闭指引"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "声音设置",
+    "playSound": "播放声音",
+    "materials": "课堂资料",
+    "classroom": "课堂",
+    "directory": "目录",
+    "lecture": "笔记",
+    "volume": "音量",
+    "mute": "静音",
+    "roundtable": "圆桌成员",
+    "captions": "字幕",
+    "controls": "播放控件",
+    "send": "发送",
+    "join": "加入",
+    "skip": "跳过",
+    "play": "播放",
+    "pause": "暂停",
+    "pblDesktop": "暂不支持预览，请用电脑打开体验",
+    "chat": "聊天",
+    "askTeacher": "向老师提问…",
+    "viewInNotes": "在笔记中查看",
+    "viewInChat": "在聊天中查看",
+    "fullSpeech": "完整发言",
+    "me": "我",
+    "listening": "旁听中",
+    "whiteboardTitle": "课堂白板"
   }
 }

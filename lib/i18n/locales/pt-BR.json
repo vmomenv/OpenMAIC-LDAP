@@ -167,6 +167,9 @@
     "videoQueueFull": "A fila de renderização está cheia. Tente novamente em instantes.",
     "videoRenderInProgress": "Uma renderização já está em andamento. Tente novamente em instantes.",
     "videoTooLarge": "O arquivo de exportação excede o limite de tamanho do serviço.",
+    "videoUploading": "Enviando projeto de vídeo...",
+    "videoQueued": "Na fila de renderização...",
+    "videoQueuePosition": "Na fila, posição {{position}}",
     "videoWarnings": "{{assets}} recurso(s) ausente(s) e {{diagnostics}} problema(s) no relatório de exportação.",
     "videoMp4Success": "Vídeo renderizado",
     "videoServiceUnavailable": "Serviço de renderização não configurado — o ZIP do projeto foi baixado para renderização local.",
@@ -805,7 +808,11 @@
     "restore": "Restaurar",
     "noHistory": "Sem histórico ainda",
     "restored": "Quadro restaurado",
-    "elementCount": "{{count}} elementos"
+    "elementCount": "{{count}} elementos",
+    "mobileEmpty": "Ainda não há anotações no quadro",
+    "mobileEmptyHint": "Deduções, fórmulas e diagramas adicionados pelo professor aparecerão aqui",
+    "zoomIn": "Aumentar zoom",
+    "zoomOut": "Diminuir zoom"
   },
   "quiz": {
     "title": "Questionário",
@@ -1836,6 +1843,9 @@
       "title": "Token Plan Setup",
       "desc": "Pick your token plan provider and enter the key — it auto-configures every adapted modality (LLM/image/video/speech/web search/web fetch).",
       "selectPlan": "Select Provider",
+      "region": "Região",
+      "regionHintDomestic": "Para contas do site da China continental",
+      "regionHintInternational": "Para contas do site internacional",
       "apiKey": "API Key",
       "updateKey": "Update key",
       "modelsCount": "{{n}} models",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "A análise de PDF e imagens requer os extras mineru[pipeline] ou mineru[core] no seu servidor MinerU. Instalações leves do mineru-api podem processar apenas documentos do Office.",
     "modelId": "ID do Modelo",
     "modelIdPlaceholder": "ex.: gpt-4o",
+    "contextWindowTokens": "Janela de contexto (tokens)",
+    "contextWindowTokensPlaceholder": "ex.: 1000000",
+    "contextWindowHint": "Opcional. Aplica-se apenas a modelos que o catálogo integrado não conhece; a compactação e a verificação do orçamento de contexto o utilizam. Deixe vazio para o padrão.",
+    "contextWindowInvalid": "Informe um número inteiro positivo de tokens ou deixe vazio.",
     "modelSelectedViaVoice": "O modelo é determinado pela escolha da voz",
     "modelServices": {
       "configured": "Configurado",
@@ -2008,7 +2022,7 @@
       "international": "Internacional"
     },
     "providerName": "Nome",
-    "providerNamePlaceholder": "ex.: Meu Proxy OpenAI",
+    "providerNamePlaceholder": "ex.: my-relay",
     "providers": "LLM",
     "requestUrl": "URL da Requisição",
     "reset": "Restaurar",
@@ -2055,10 +2069,11 @@
       "showKey": "Mostrar chave",
       "hideKey": "Ocultar chave",
       "inUse": "Em uso",
-      "modelFromCatalogue": "O nome, as capacidades e a janela de contexto do modelo vêm do catálogo integrado.",
+      "modelFromCatalogue": "O nome e as capacidades do modelo vêm do catálogo integrado.",
       "modelWhenInUse": "Usado quando este serviço é selecionado na configuração de modelos do curso.",
       "planServer": "Configurado pelo servidor",
       "providerIdHint": "Salvo como \"{{id}}\"",
+      "providerNameNeedsLatin": "O nome precisa de pelo menos uma letra a–z ou um dígito para ser salvo como identificador.",
       "openaiCompatible": "Compatível com OpenAI",
       "notNarration": "Este serviço não é a narração do espaço de trabalho.",
       "useForNarration": "Usar para a narração",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "Começar a editar"
+    },
+    "mobile": {
+      "openMenu": "Abrir navegação",
+      "closeMenu": "Fechar navegação"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "Fechar guia"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "Configurações de som",
+    "playSound": "Reproduzir som",
+    "materials": "Material do curso",
+    "classroom": "Aula",
+    "directory": "Conteúdo",
+    "lecture": "Notas",
+    "volume": "Volume",
+    "mute": "Silenciar",
+    "roundtable": "Participantes",
+    "captions": "Legendas",
+    "controls": "Controles de reprodução",
+    "send": "Enviar",
+    "join": "Participar",
+    "skip": "Pular",
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "pblDesktop": "A prévia não está disponível em celulares. Abra este projeto em um computador para experimentar.",
+    "chat": "Conversa",
+    "askTeacher": "Pergunte ao professor…",
+    "viewInNotes": "Ver nas anotações",
+    "viewInChat": "Ver no chat",
+    "fullSpeech": "Mensagem completa",
+    "me": "Eu",
+    "listening": "Ouvindo",
+    "whiteboardTitle": "Quadro da aula"
   }
 }

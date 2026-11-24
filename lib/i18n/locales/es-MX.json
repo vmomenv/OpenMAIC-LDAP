@@ -167,6 +167,9 @@
     "videoQueueFull": "La cola de renderizado está llena. Inténtalo de nuevo en unos momentos.",
     "videoRenderInProgress": "Ya hay un renderizado en curso. Inténtalo de nuevo en unos momentos.",
     "videoTooLarge": "El archivo de exportación supera el límite de tamaño del servicio.",
+    "videoUploading": "Subiendo proyecto de video...",
+    "videoQueued": "En espera en la cola de renderizado...",
+    "videoQueuePosition": "En la cola, posición {{position}}",
     "videoWarnings": "{{assets}} recurso(s) faltante(s) y {{diagnostics}} problema(s) en el reporte de exportación.",
     "videoMp4Success": "Video renderizado",
     "videoServiceUnavailable": "Servicio de renderizado no configurado — se descargó el ZIP del proyecto para renderizar en tu equipo.",
@@ -805,7 +808,11 @@
     "restore": "Restaurar",
     "noHistory": "Aún no hay historial",
     "restored": "Pizarrón restaurado",
-    "elementCount": "{{count}} elementos"
+    "elementCount": "{{count}} elementos",
+    "mobileEmpty": "Aún no hay notas en el pizarrón",
+    "mobileEmptyHint": "Las deducciones, fórmulas y diagramas que agregue el docente aparecerán aquí",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar"
   },
   "quiz": {
     "title": "Cuestionario",
@@ -1836,6 +1843,9 @@
       "title": "Configuración del plan de tokens",
       "desc": "Elige tu proveedor de plan de tokens e ingresa la clave — se autoconfigura cada modalidad adaptada (LLM/imagen/video/voz/búsqueda web/obtención de páginas web).",
       "selectPlan": "Seleccionar proveedor",
+      "region": "Región",
+      "regionHintDomestic": "Para cuentas del sitio de China continental",
+      "regionHintInternational": "Para cuentas del sitio internacional",
       "apiKey": "Clave API",
       "updateKey": "Actualizar clave",
       "modelsCount": "{{n}} modelos",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "El análisis de PDF e imágenes requiere los extras mineru[pipeline] o mineru[core] en tu servidor MinerU. Las instalaciones ligeras de mineru-api pueden manejar solo documentos de Office.",
     "modelId": "ID del modelo",
     "modelIdPlaceholder": "p. ej., gpt-4o",
+    "contextWindowTokens": "Ventana de contexto (tokens)",
+    "contextWindowTokensPlaceholder": "p. ej., 1000000",
+    "contextWindowHint": "Opcional. Se aplica solo a modelos que el catálogo integrado no conoce; la compactación y la verificación del presupuesto de contexto lo usan. Déjalo vacío para el valor predeterminado.",
+    "contextWindowInvalid": "Escribe un número entero positivo de tokens, o déjalo vacío.",
     "modelSelectedViaVoice": "El modelo se determina según la voz seleccionada",
     "modelServices": {
       "configured": "Configurado",
@@ -2008,7 +2022,7 @@
       "international": "Internacional"
     },
     "providerName": "Nombre",
-    "providerNamePlaceholder": "p. ej., Mi proxy de OpenAI",
+    "providerNamePlaceholder": "p. ej., my-relay",
     "providers": "LLM",
     "requestUrl": "URL de solicitud",
     "reset": "Restablecer",
@@ -2055,10 +2069,11 @@
       "showKey": "Mostrar clave",
       "hideKey": "Ocultar clave",
       "inUse": "En uso",
-      "modelFromCatalogue": "El nombre, las capacidades y la ventana de contexto del modelo provienen del catálogo integrado.",
+      "modelFromCatalogue": "El nombre y las capacidades del modelo provienen del catálogo integrado.",
       "modelWhenInUse": "Se usa cuando este servicio se selecciona en la configuración de modelos del curso.",
       "planServer": "Configurado por el servidor",
       "providerIdHint": "Se guarda como \"{{id}}\"",
+      "providerNameNeedsLatin": "El nombre necesita al menos una letra a–z o un dígito para guardarse como identificador.",
       "openaiCompatible": "Compatible con OpenAI",
       "notNarration": "Este servicio no es la narración del espacio de trabajo.",
       "useForNarration": "Usar para la narración",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "Empezar a editar"
+    },
+    "mobile": {
+      "openMenu": "Abrir navegación",
+      "closeMenu": "Cerrar navegación"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "Cerrar guía"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "Configuración de sonido",
+    "playSound": "Reproducir sonido",
+    "materials": "Material del curso",
+    "classroom": "Clase",
+    "directory": "Índice",
+    "lecture": "Notas",
+    "volume": "Volumen",
+    "mute": "Silenciar",
+    "roundtable": "Participantes",
+    "captions": "Subtítulos",
+    "controls": "Controles de reproducción",
+    "send": "Enviar",
+    "join": "Unirse",
+    "skip": "Omitir",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "pblDesktop": "La vista previa no está disponible en teléfonos. Abre este proyecto en una computadora para probarlo.",
+    "chat": "Chat",
+    "askTeacher": "Pregunta al docente…",
+    "viewInNotes": "Ver en las notas",
+    "viewInChat": "Ver en el chat",
+    "fullSpeech": "Mensaje completo",
+    "me": "Yo",
+    "listening": "Escuchando",
+    "whiteboardTitle": "Pizarrón de la clase"
   }
 }

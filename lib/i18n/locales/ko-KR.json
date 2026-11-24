@@ -167,6 +167,9 @@
     "videoQueueFull": "렌더링 대기열이 혼잡합니다. 잠시 후 다시 시도해 주세요.",
     "videoRenderInProgress": "이미 렌더링 작업이 진행 중입니다. 잠시 후 다시 시도해 주세요.",
     "videoTooLarge": "내보내기 파일이 서비스의 크기 제한을 초과했습니다.",
+    "videoUploading": "비디오 프로젝트 업로드 중...",
+    "videoQueued": "렌더링 대기열에서 대기 중...",
+    "videoQueuePosition": "대기열에서 {{position}}번째",
     "videoWarnings": "{{assets}}개의 에셋이 누락되었고 내보내기 보고서에 {{diagnostics}}개의 문제가 있습니다.",
     "videoMp4Success": "동영상이 렌더링되었습니다",
     "videoServiceUnavailable": "렌더 서비스가 구성되지 않았습니다 — 로컬 렌더링용 프로젝트 ZIP을 다운로드했습니다.",
@@ -805,7 +808,11 @@
     "restore": "복원",
     "noHistory": "아직 기록이 없습니다",
     "restored": "화이트보드가 복원되었습니다",
-    "elementCount": "요소 {{count}}개"
+    "elementCount": "요소 {{count}}개",
+    "mobileEmpty": "아직 판서가 없습니다",
+    "mobileEmptyHint": "선생님이 추가한 풀이, 수식, 도표가 여기에 표시됩니다",
+    "zoomIn": "확대",
+    "zoomOut": "축소"
   },
   "quiz": {
     "title": "퀴즈",
@@ -1836,6 +1843,9 @@
       "title": "Token Plan Setup",
       "desc": "Pick your token plan provider and enter the key — it auto-configures every adapted modality (LLM/image/video/speech/web search/web fetch).",
       "selectPlan": "Select Provider",
+      "region": "서비스 지역",
+      "regionHintDomestic": "중국 본토 사이트 계정용",
+      "regionHintInternational": "해외 사이트 계정용",
       "apiKey": "API Key",
       "updateKey": "Update key",
       "modelsCount": "{{n}} models",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "PDF 및 이미지 파싱에는 MinerU 서버에 mineru[pipeline] 또는 mineru[core] 추가 종속성이 필요합니다. 경량 mineru-api 설치에서는 Office 문서만 처리할 수 있습니다.",
     "modelId": "모델 ID",
     "modelIdPlaceholder": "예: gpt-4o",
+    "contextWindowTokens": "컨텍스트 윈도우(tokens)",
+    "contextWindowTokensPlaceholder": "예: 1000000",
+    "contextWindowHint": "선택 사항. 내장 카탈로그에 없는 모델에만 적용되며, 압축과 컨텍스트 예산 검사에 사용됩니다. 비워 두면 기본값을 사용합니다.",
+    "contextWindowInvalid": "양의 정수(token 수)를 입력하거나 비워 두세요.",
     "modelSelectedViaVoice": "모델은 음성 선택으로 결정됩니다",
     "modelServices": {
       "configured": "구성됨",
@@ -2008,7 +2022,7 @@
       "international": "해외"
     },
     "providerName": "이름",
-    "providerNamePlaceholder": "예: 나의 OpenAI 프록시",
+    "providerNamePlaceholder": "예: my-relay",
     "providers": "LLM",
     "requestUrl": "요청 URL",
     "reset": "초기화",
@@ -2055,10 +2069,11 @@
       "showKey": "키 표시",
       "hideKey": "키 숨기기",
       "inUse": "사용 중",
-      "modelFromCatalogue": "모델 이름, 기능, 컨텍스트 창은 내장 카탈로그에서 가져옵니다.",
+      "modelFromCatalogue": "모델 이름과 기능은 내장 카탈로그에서 가져옵니다.",
       "modelWhenInUse": "코스 모델 설정에서 이 서비스를 선택하면 사용됩니다.",
       "planServer": "서버에서 구성됨",
       "providerIdHint": "\"{{id}}\"(으)로 저장",
+      "providerNameNeedsLatin": "이름에 영문자(a–z) 또는 숫자를 포함해야 ID로 저장할 수 있습니다.",
       "openaiCompatible": "OpenAI 호환",
       "notNarration": "이 서비스는 워크스페이스의 내레이션이 아닙니다.",
       "useForNarration": "내레이션에 사용",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "편집 시작"
+    },
+    "mobile": {
+      "openMenu": "탐색 열기",
+      "closeMenu": "탐색 닫기"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "안내 닫기"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "소리 설정",
+    "playSound": "소리 재생",
+    "materials": "수업 자료",
+    "classroom": "수업",
+    "directory": "목차",
+    "lecture": "노트",
+    "volume": "음량",
+    "mute": "음소거",
+    "roundtable": "참여자",
+    "captions": "자막",
+    "controls": "재생 컨트롤",
+    "send": "보내기",
+    "join": "참여",
+    "skip": "건너뛰기",
+    "play": "재생",
+    "pause": "일시정지",
+    "pblDesktop": "휴대폰에서는 미리보기를 지원하지 않습니다. 컴퓨터에서 열어 체험해 주세요.",
+    "chat": "채팅",
+    "askTeacher": "선생님께 질문…",
+    "viewInNotes": "노트에서 보기",
+    "viewInChat": "채팅에서 보기",
+    "fullSpeech": "전체 발언",
+    "me": "나",
+    "listening": "청강 중",
+    "whiteboardTitle": "수업 화이트보드"
   }
 }

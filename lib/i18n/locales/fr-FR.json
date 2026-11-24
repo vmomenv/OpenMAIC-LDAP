@@ -167,6 +167,9 @@
     "videoQueueFull": "La file d’attente de rendu est pleine. Réessayez dans quelques instants.",
     "videoRenderInProgress": "Un rendu est déjà en cours. Réessayez dans quelques instants.",
     "videoTooLarge": "Le fichier d’exportation dépasse la taille maximale autorisée par le service.",
+    "videoUploading": "Envoi du projet vidéo...",
+    "videoQueued": "Dans la file d’attente de rendu...",
+    "videoQueuePosition": "Dans la file, position {{position}}",
     "videoWarnings": "Rapport d’export : {{assets}} ressources manquantes et {{diagnostics}} problèmes.",
     "videoMp4Success": "Vidéo générée",
     "videoServiceUnavailable": "Service de rendu non configuré. Le ZIP du projet a été téléchargé pour un rendu local.",
@@ -805,7 +808,11 @@
     "restore": "Restaurer",
     "noHistory": "Aucun historique pour l’instant",
     "restored": "Tableau blanc restauré",
-    "elementCount": "{{count}} éléments"
+    "elementCount": "{{count}} éléments",
+    "mobileEmpty": "Pas encore de notes au tableau",
+    "mobileEmptyHint": "Les démonstrations, formules et schémas ajoutés par l’enseignant apparaîtront ici",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière"
   },
   "quiz": {
     "title": "Quiz",
@@ -1836,6 +1843,9 @@
       "title": "Configuration du forfait de jetons",
       "desc": "Choisissez votre fournisseur de forfait de jetons et saisissez la clé : toutes les modalités prises en charge sont configurées automatiquement (LLM, image, vidéo, parole, recherche web, récupération web).",
       "selectPlan": "Choisir un fournisseur",
+      "region": "Région",
+      "regionHintDomestic": "Pour les comptes du site de Chine continentale",
+      "regionHintInternational": "Pour les comptes du site international",
       "apiKey": "Clé d’API",
       "updateKey": "Mettre à jour la clé",
       "modelsCount": "{{n}} modèles",
@@ -1975,6 +1985,10 @@
     "mineruSelfHostFormatsNote": "L’analyse des PDF et des images nécessite les extensions mineru[pipeline] ou mineru[core] sur votre serveur MinerU. Une installation légère de mineru-api peut ne traiter que les documents bureautiques.",
     "modelId": "Identifiant du modèle",
     "modelIdPlaceholder": "par exemple, gpt-4o",
+    "contextWindowTokens": "Fenêtre de contexte (tokens)",
+    "contextWindowTokensPlaceholder": "ex. 1000000",
+    "contextWindowHint": "Facultatif. Ne s'applique qu'aux modèles inconnus du catalogue intégré ; la compaction et la vérification du budget de contexte l'utilisent. Laissez vide pour la valeur par défaut.",
+    "contextWindowInvalid": "Saisissez un nombre entier positif de tokens, ou laissez vide.",
     "modelSelectedViaVoice": "Le modèle est déterminé par la voix choisie",
     "modelServices": {
       "configured": "Configuré",
@@ -2008,7 +2022,7 @@
       "international": "International"
     },
     "providerName": "Nom",
-    "providerNamePlaceholder": "par exemple, Mon proxy OpenAI",
+    "providerNamePlaceholder": "par exemple, my-relay",
     "providers": "LLM",
     "requestUrl": "URL de la requête",
     "reset": "Réinitialiser",
@@ -2055,10 +2069,11 @@
       "showKey": "Afficher la clé",
       "hideKey": "Masquer la clé",
       "inUse": "Utilisé",
-      "modelFromCatalogue": "Le nom, les capacités et la fenêtre de contexte du modèle proviennent du catalogue intégré.",
+      "modelFromCatalogue": "Le nom et les capacités du modèle proviennent du catalogue intégré.",
       "modelWhenInUse": "Utilisé une fois ce service sélectionné dans la configuration des modèles du cours.",
       "planServer": "Configuré par le serveur",
       "providerIdHint": "Enregistré sous « {{id}} »",
+      "providerNameNeedsLatin": "Le nom doit contenir au moins une lettre a–z ou un chiffre pour être enregistré comme identifiant.",
       "openaiCompatible": "Compatible OpenAI",
       "notNarration": "Ce service n'est pas la narration de l'espace de travail.",
       "useForNarration": "Utiliser pour la narration",
@@ -2674,6 +2689,10 @@
         }
       },
       "editDone": "Commencer"
+    },
+    "mobile": {
+      "openMenu": "Ouvrir la navigation",
+      "closeMenu": "Fermer la navigation"
     }
   },
   "profile": {
@@ -3439,5 +3458,32 @@
       },
       "close": "Fermer le guide"
     }
+  },
+  "mobileClassroom": {
+    "soundSettings": "Paramètres audio",
+    "playSound": "Activer le son",
+    "materials": "Supports de cours",
+    "classroom": "Classe",
+    "directory": "Sommaire",
+    "lecture": "Notes",
+    "volume": "Volume",
+    "mute": "Muet",
+    "roundtable": "Participants",
+    "captions": "Sous-titres",
+    "controls": "Commandes de lecture",
+    "send": "Envoyer",
+    "join": "Rejoindre",
+    "skip": "Passer",
+    "play": "Lire",
+    "pause": "Pause",
+    "pblDesktop": "L’aperçu n’est pas disponible sur téléphone. Ouvrez ce projet sur un ordinateur pour l’essayer.",
+    "chat": "Discussion",
+    "askTeacher": "Poser une question…",
+    "viewInNotes": "Voir dans les notes",
+    "viewInChat": "Voir dans le chat",
+    "fullSpeech": "Message complet",
+    "me": "Moi",
+    "listening": "À l’écoute",
+    "whiteboardTitle": "Tableau du cours"
   }
 }
