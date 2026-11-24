@@ -18,6 +18,7 @@ import type { NextRequest } from 'next/server';
 
 import { createLogger } from '@/lib/logger';
 import { apiError } from '@/lib/server/api-response';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
 import { resolveModelFromRequest } from '@/lib/server/resolve-model';
 
 import { createSSEResponse } from '@/lib/pbl/v2/api/sse';
@@ -35,6 +36,9 @@ interface InstructorRequest {
 }
 
 export async function POST(req: NextRequest) {
+  const refusal = await assertGuestCapability(req, 'pbl');
+  if (refusal) return refusal;
+
   let body: InstructorRequest;
   try {
     body = (await req.json()) as InstructorRequest;

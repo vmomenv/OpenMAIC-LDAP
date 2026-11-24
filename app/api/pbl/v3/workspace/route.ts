@@ -5,8 +5,13 @@ import {
   workbenchView,
   type WorkbenchCommand,
 } from '@/lib/server/pbl-v3/workbench';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
+
 export const runtime = 'nodejs';
 export async function GET(request: Request) {
+  const refusal = await assertGuestCapability(request, 'pbl');
+  if (refusal) return refusal;
+
   return sandboxPrincipalResponse(request, async (principal) => {
     const id = new URL(request.url).searchParams.get('id');
     if (!id) throw sandboxInvalid('A learning session is required.');
@@ -14,6 +19,9 @@ export async function GET(request: Request) {
   });
 }
 export async function POST(request: Request) {
+  const refusal = await assertGuestCapability(request, 'pbl');
+  if (refusal) return refusal;
+
   return sandboxPrincipalResponse(request, async (principal) => {
     const body = await sandboxBody(request, 256000);
     if (typeof body.studyId !== 'string') throw sandboxInvalid('A learning session is required.');

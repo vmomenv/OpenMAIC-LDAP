@@ -16,6 +16,7 @@ import {
   isPiNativeChildRuntimeEnabled,
   isPiNativeChildSpotlightEnabled,
 } from '@/lib/config/feature-flags';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
 import { createLogger } from '@/lib/logger';
 import { resolveAgentConfigs } from '@/lib/chat/pi/config';
 import { createWhiteboardPreview } from '@/lib/chat/pi/whiteboard-preview';
@@ -50,6 +51,9 @@ import {
 const log = createLogger('Pi Chat API');
 
 export async function POST(req: NextRequest) {
+  const refusal = await assertGuestCapability(req, 'chat');
+  if (refusal) return refusal;
+
   // Like every owner-resolving route, a request whose credential an owner
   // auth method refuses is refused here, before any model work. With the
   // default anonymous fallback resolution always succeeds, so this only

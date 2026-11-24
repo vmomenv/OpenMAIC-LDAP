@@ -10,8 +10,13 @@ import {
   bindPackageReferences,
 } from '@/lib/server/pbl-v3/project-resolver';
 
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
+
 export const runtime = 'nodejs';
 export async function POST(request: Request) {
+  const refusal = await assertGuestCapability(request, 'pbl');
+  if (refusal) return refusal;
+
   return sandboxPrincipalResponse(request, async (principal) => {
     const { ownerId } = principal;
     const body = await sandboxBody(request, 32 * 1024 * 1024);

@@ -23,6 +23,7 @@ import {
   TTSModelNotAllowedError,
 } from '@/lib/server/provider-config';
 import type { TTSProviderId } from '@/lib/audio/types';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
 import { createLogger } from '@/lib/logger';
 import { apiError, apiSuccess, type ApiErrorCode } from '@/lib/server/api-response';
 import { findUnsafeNetworkTargetError, validatePublicUrlForSSRF } from '@/lib/server/ssrf-guard';
@@ -55,6 +56,9 @@ const REFUSAL_CODES: Record<NarrationRefusal, ApiErrorCode> = {
 };
 
 export async function POST(req: NextRequest) {
+  const refusal = await assertGuestCapability(req, 'tts');
+  if (refusal) return refusal;
+
   // The provider and voice the narration resolves, for the failure log.
   const trace: { providerId?: string; voice?: string } = {};
   let audioId: string | undefined;

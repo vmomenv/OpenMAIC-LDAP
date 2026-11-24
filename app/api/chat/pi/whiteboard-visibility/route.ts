@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 
 import { settleWhiteboardVisibility } from '@/lib/chat/pi/whiteboard-visibility';
 import { apiError } from '@/lib/server/api-response';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
 import { resolveRequestOwner } from '@/lib/server/identity/resolve';
 import {
   attachOwnerCookies,
@@ -33,6 +34,9 @@ function validBody(value: unknown): value is {
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
+  const refusal = await assertGuestCapability(req, 'chat');
+  if (refusal) return refusal;
+
   // The pending query is keyed by the learner key the Pi request resolved,
   // which is the request owner; only that owner can settle it.
   const owner = await resolveRequestOwner(req);

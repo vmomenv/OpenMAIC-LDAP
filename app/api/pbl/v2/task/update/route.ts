@@ -20,6 +20,7 @@
 import type { NextRequest } from 'next/server';
 
 import { apiError, apiSuccess } from '@/lib/server/api-response';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
 
 import {
   startMicrotask,
@@ -44,6 +45,9 @@ interface UpdateRequest {
 }
 
 export async function POST(req: NextRequest) {
+  const refusal = await assertGuestCapability(req, 'pbl');
+  if (refusal) return refusal;
+
   let body: UpdateRequest;
   try {
     body = (await req.json()) as UpdateRequest;

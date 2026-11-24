@@ -34,6 +34,7 @@ import {
   resolveQwenVoiceCloneModel,
   resolveTTSModel,
 } from '@/lib/server/provider-config';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
 import { createLogger } from '@/lib/logger';
 import { apiError, apiSuccess } from '@/lib/server/api-response';
 import { findUnsafeNetworkTargetError, validatePublicUrlForSSRF } from '@/lib/server/ssrf-guard';
@@ -72,6 +73,9 @@ function childSignal(
 }
 
 export async function POST(req: NextRequest) {
+  const refusal = await assertGuestCapability(req, 'tts');
+  if (refusal) return refusal;
+
   let providerId: string | undefined;
   let voiceId: string | undefined;
   const deadline = new AbortController();

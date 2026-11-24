@@ -23,8 +23,13 @@ import { resolveProject } from '@/lib/server/pbl-v3/project-resolver';
 import { projectHeroDetails } from '@/lib/server/pbl-v3/project-hero';
 import { installedProject, publicProjects } from '@/lib/server/pbl-v3/catalog';
 
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
+
 export const runtime = 'nodejs';
 export async function GET(request: Request) {
+  const refusal = await assertGuestCapability(request, 'pbl');
+  if (refusal) return refusal;
+
   return sandboxPrincipalResponse(request, async (principal) => {
     if (new URL(request.url).searchParams.get('samples') === '1')
       return Response.json(publicProjects());
@@ -97,6 +102,9 @@ export async function GET(request: Request) {
   });
 }
 export async function POST(request: Request) {
+  const refusal = await assertGuestCapability(request, 'pbl');
+  if (refusal) return refusal;
+
   return sandboxPrincipalResponse(request, async (principal) => {
     const body = await sandboxBody(request, 256_000);
     try {

@@ -10,6 +10,7 @@ import { NextRequest } from 'next/server';
 import { callLLM } from '@/lib/ai/llm';
 import { createLogger } from '@/lib/logger';
 import { apiError, apiSuccess } from '@/lib/server/api-response';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
 import { resolveModelFromRequest } from '@/lib/server/resolve-model';
 const log = createLogger('Quiz Grade');
 
@@ -27,6 +28,9 @@ interface GradeResponse {
 }
 
 export async function POST(req: NextRequest) {
+  const refusal = await assertGuestCapability(req, 'quiz');
+  if (refusal) return refusal;
+
   let questionSnippet: string | undefined;
   let resolvedPoints: number | undefined;
   try {

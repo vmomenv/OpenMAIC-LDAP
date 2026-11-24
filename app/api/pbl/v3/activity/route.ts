@@ -3,10 +3,15 @@ import { sandboxInvalid } from '@/lib/sandbox/errors';
 import { LearningStore } from '@/lib/server/pbl-v3/store';
 import { SandboxService } from '@/lib/server/sandbox/service';
 
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
+
 export const runtime = 'nodejs';
 
 /** A coalesced user-input signal. Never allocates compute or advances teaching progress. */
-export function POST(request: Request) {
+export async function POST(request: Request) {
+  const refusal = await assertGuestCapability(request, 'pbl');
+  if (refusal) return refusal;
+
   return sandboxPrincipalResponse(request, async (principal) => {
     const body = await sandboxBody(request);
     if (typeof body.stageId !== 'string' || typeof body.sceneId !== 'string')

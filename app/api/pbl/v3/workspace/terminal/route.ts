@@ -2,8 +2,13 @@ import { sandboxPrincipalResponse } from '@/lib/server/sandbox/http';
 import { sandboxConflict, sandboxInvalid } from '@/lib/sandbox/errors';
 import { LearningStore } from '@/lib/server/pbl-v3/store';
 import { SandboxService } from '@/lib/server/sandbox/service';
+import { assertGuestCapability } from '@/lib/server/identity/classroom-guest/access';
+
 export const runtime = 'nodejs';
 export async function GET(request: Request) {
+  const refusal = await assertGuestCapability(request, 'pbl');
+  if (refusal) return refusal;
+
   return sandboxPrincipalResponse(request, async (principal) => {
     const params = new URL(request.url).searchParams,
       id = params.get('id'),
