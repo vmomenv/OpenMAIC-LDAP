@@ -1,5 +1,14 @@
-import { HttpAssetStore, HttpDocumentStore } from '@openmaic/storage';
+import {
+  BrowserKVStore,
+  BrowserRuntimeStore,
+  HttpAssetStore,
+  HttpDocumentStore,
+} from '@openmaic/storage';
 import { HttpRuntimeStore } from '@openmaic/storage/runtime/http';
+
+import { getGuestRecordPolicy } from '@/lib/runtime/guest-records';
+import { getLearnerKey } from '@/lib/runtime/learner-key';
+import { MemoryRuntimeStore } from '@/lib/runtime/memory-store';
 
 import {
   assertDocumentStorageConfigurable,
@@ -65,9 +74,20 @@ export function getPersistenceLearnerKey(): Promise<string> {
  * branch; it constructs its own stores.
  */
 if (typeof window !== 'undefined') {
+  const httpRuntimeStore = () => new HttpRuntimeStore({ baseUrl: '/api/persistence' });
+  const browserRuntimeStore = new BrowserRuntimeStore();
+  const memoryRuntimeStore = new MemoryRuntimeStore();
+  const guestBrowserLearnerKey = () => getLearnerKey(new BrowserKVStore());
   const runtimeOptions = {
-    store: () => new HttpRuntimeStore({ baseUrl: '/api/persistence' }),
-    learnerKey: getPersistenceLearnerKey,
+    store: () => {
+      const guest = getGuestRecordPolicy();
+      if (!guest.guest) return httpRuntimeStore();
+      return guest.localRecords ? browserRuntimeStore : memoryRuntimeStore;
+    },
+    learnerKey: () => {
+      const guest = getGuestRecordPolicy();
+      return guest.guest ? guestBrowserLearnerKey() : getPersistenceLearnerKey();
+    },
   };
   const documentOptions: DocumentStorageOptions = {
     store: ({ validateScene, validateStage }) =>
@@ -101,7 +121,12 @@ if (typeof window !== 'undefined') {
 
   // One-way import of what earlier builds stored in this browser. Temporary;
   // loaded on demand after the page is idle. See lib/legacy-browser-import.
-  void import('@/lib/legacy-browser-import')
-    .then(({ scheduleLegacyBrowserImport }) => scheduleLegacyBrowserImport())
-    .catch((error: unknown) => console.warn('[legacy-browser-import] Could not load:', error));
+  // Anonymous classroom visitors never run it: binding this browser id to the
+  // throwaway guest owner would make a later sign-in import refuse the
+  // browser's real legacy data.
+  if (!/(?:^|;\s*)openmaic_guest=1(?:;|$)/.test(document.cookie)) {
+    void import('@/lib/legacy-browser-import')
+      .then(({ scheduleLegacyBrowserImport }) => scheduleLegacyBrowserImport())
+      .catch((error: unknown) => console.warn('[legacy-browser-import] Could not load:', error));
+  }
 }
