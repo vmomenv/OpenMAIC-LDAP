@@ -11,6 +11,7 @@ import {
   DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useI18n } from '@/lib/hooks/use-i18n';
+import { isLdapLoginEnabled } from '@/lib/config/feature-flags';
 import { fetchStageMeta } from '@/lib/classroom/stage-meta-client';
 import type { GuestPermissions } from '@/lib/persistence/stage-meta';
 
@@ -58,7 +59,8 @@ export function GuestAccessSubmenu({ stageId, isOwner, canExport }: GuestAccessS
     };
   }, [stageId, isOwner]);
 
-  if (!isOwner || !stageId) return null;
+  // Without LDAP every visitor already has access; nothing to configure.
+  if (!isLdapLoginEnabled() || !isOwner || !stageId) return null;
 
   const patch = async (next: Partial<GuestPermissions>) => {
     setPermissions((current) => (current ? { ...current, ...next } : current));

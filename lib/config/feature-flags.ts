@@ -12,6 +12,15 @@ function readBoolean(envValue: string | undefined): boolean {
 }
 
 /**
+ * LDAP login gate, as compiled into the browser bundle. When it is off the
+ * deployment is open to any visitor by design, so the per-course visitor
+ * permissions are neither shown nor enforced.
+ */
+export function isLdapLoginEnabled(): boolean {
+  return readBoolean(process.env.NEXT_PUBLIC_LDAP_ENABLED);
+}
+
+/**
  * Server-only gate for durable background agent execution. This is evaluated
  * at process runtime and is never exposed to the browser bundle.
  */
