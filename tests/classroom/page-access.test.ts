@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/lib/server/identity/ldap/config', () => ({
   ldapEnabled: () => mocks.ldapEnabled,
 }));
-vi.mock('@/lib/server/identity/classroom-guest/access', () => ({
+vi.mock('@/lib/server/identity/classroom-guest/session', () => ({
   hasLiveLdapSession: () => mocks.liveSession,
 }));
 vi.mock('@/lib/server/stage-access', () => ({

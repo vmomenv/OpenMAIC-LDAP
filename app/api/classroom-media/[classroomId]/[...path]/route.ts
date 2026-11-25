@@ -8,10 +8,8 @@ import {
 } from '@/lib/server/classroom-storage';
 import { parseRangeHeader } from '@/lib/server/http-range';
 import { isGuestRequest, readGuestOwner } from '@/lib/server/identity/classroom-guest/cookies';
-import {
-  hasLiveLdapSession,
-  isStageReadableByGuest,
-} from '@/lib/server/identity/classroom-guest/access';
+import { isStageReadableByGuest } from '@/lib/server/identity/classroom-guest/access';
+import { hasLiveLdapSession } from '@/lib/server/identity/classroom-guest/session';
 import { ldapEnabled } from '@/lib/server/identity/ldap/config';
 import { readStageAccessIncludingDeleted } from '@/lib/server/stage-access';
 import { createLogger } from '@/lib/logger';

@@ -8,9 +8,9 @@
  * fall back to guest mode instead of refusing the request.
  */
 import type { OwnerAuthMethod, OwnerPrincipal } from '../types';
-import { hasLiveLdapSession } from './access';
 import { isGuestRequest, readGuestOwner } from './cookies';
 import { isGuestAllowedApiPath } from './paths';
+import { hasLiveLdapSession } from './session';
 
 export interface ClassroomGuestAuthOptions {
   /** Signing secret of the deployment's LDAP sessions. */

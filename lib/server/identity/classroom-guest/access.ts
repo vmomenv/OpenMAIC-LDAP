@@ -7,9 +7,9 @@
  */
 import { resolveStageAccess } from '@/lib/server/stage-access';
 import type { OwnerPrincipal } from '../types';
-import { ldapEnabled, readLdapConfig } from '../ldap/config';
-import { readLdapSessionToken, verifyLdapSession } from '../ldap/session';
+import { ldapEnabled } from '../ldap/config';
 import { isValidStageId, isGuestRequest, readGuestOwner } from './cookies';
+import { hasLiveLdapSession } from './session';
 
 export type GuestCapability = 'quiz' | 'tts' | 'chat' | 'pbl';
 
@@ -21,21 +21,6 @@ interface GuestCheckRequest {
 /** Whether this request resolved as an anonymous classroom visitor. */
 export function isClassroomGuest(principal: Pick<OwnerPrincipal, 'channel'>): boolean {
   return principal.channel === 'classroom-guest';
-}
-
-/** Whether the request carries a live LDAP account session. */
-export function hasLiveLdapSession(headers: Headers, secret?: string): boolean {
-  if (!ldapEnabled()) return false;
-  const token = readLdapSessionToken(headers);
-  if (!token) return false;
-  try {
-    const sessionSecret = secret ?? readLdapConfig().sessionSecret;
-    return verifyLdapSession(token, { secret: sessionSecret }) !== null;
-  } catch {
-    // An incomplete LDAP configuration fails the boot; a request that somehow
-    // arrives anyway must not be treated as a signed-in account.
-    return false;
-  }
 }
 
 /** The course whose classroom is on screen, from header, Referer or cookie. */

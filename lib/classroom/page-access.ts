@@ -6,7 +6,7 @@
  * courses keep the old "sign in first" behaviour and do not reveal whether the
  * id exists.
  */
-import { hasLiveLdapSession } from '@/lib/server/identity/classroom-guest/access';
+import { hasLiveLdapSession } from '@/lib/server/identity/classroom-guest/session';
 import { ldapEnabled } from '@/lib/server/identity/ldap/config';
 import { resolveStageAccess } from '@/lib/server/stage-access';
 
