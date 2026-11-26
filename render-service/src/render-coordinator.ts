@@ -11,6 +11,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { ArtifactStore } from './artifact-store.js';
 import { config } from './config.js';
+import { sanitizeFailureReason } from './failure-reason.js';
 import type { JobStore } from './job-store.js';
 import type { RenderExecutor } from './render-executor.js';
 import { emitRenderEvent, type RenderEventSink, type RenderOutcome } from './events.js';
@@ -47,6 +48,10 @@ export class RenderRejectedError extends Error {
     super(message);
   }
 }
+
+// Family names come from uploaded HTML; keep the warning line bounded.
+const MAX_LOGGED_FONT_FAMILIES = 8;
+const MAX_LOGGED_FONT_FAMILY_LENGTH = 80;
 
 function planPathForProject(dir: string): string {
   return join(
@@ -279,7 +284,12 @@ export class RenderCoordinator {
    * Close a job's lifecycle in the log. Also drops its submission timestamp so
    * the map cannot grow without bound across a long-lived process.
    */
-  private finishEvent(id: string, outcome: RenderOutcome, errorCode?: string): void {
+  private finishEvent(
+    id: string,
+    outcome: RenderOutcome,
+    errorCode?: string,
+    failureMessage?: string,
+  ): void {
     // Deleting the timing entry is also what makes this idempotent. A terminal
     // job-store write can reject *after* an outcome is known, which lands in the
     // caller's catch and would otherwise close the same job a second time with a
@@ -301,6 +311,9 @@ export class RenderCoordinator {
             renderMs: now - timing.startedAt,
           }),
       ...(errorCode === undefined ? {} : { errorCode }),
+      ...(outcome === 'failed' && failureMessage !== undefined
+        ? { failureReason: sanitizeFailureReason(failureMessage) }
+        : {}),
     });
   }
 
@@ -314,11 +327,12 @@ export class RenderCoordinator {
     projectDir: string,
     result: Exclude<RenderExecutionResult, { status: 'succeeded' }>,
   ): Promise<void> {
-    // `failure.code` is a fixed vocabulary; the free-text message is not logged.
+    // Keep the fixed failure code and add only a sanitized diagnostic.
     this.finishEvent(
       id,
       result.status,
       result.status === 'failed' ? result.failure.code : undefined,
+      result.status === 'failed' ? result.failure.message : undefined,
     );
     try {
       await this.jobs.update(id, {
@@ -367,6 +381,15 @@ export class RenderCoordinator {
           options,
           signal: abort.signal,
           deadlineMs: this.jobDeadlineMs,
+          onFontFallback: ({ families }) =>
+            this.onEvent({
+              event: 'render_font_fallback',
+              jobId: id,
+              fontFallbackCount: families.length,
+              fontFallbackFamilies: families
+                .slice(0, MAX_LOGGED_FONT_FAMILIES)
+                .map((family) => family.slice(0, MAX_LOGGED_FONT_FAMILY_LENGTH)),
+            }),
           onProgress: async (progress) => {
             await this.jobs.update(id, {
               status: 'running',
@@ -433,7 +456,7 @@ export class RenderCoordinator {
           code: 'execution_failed',
           message: error instanceof Error ? error.message : String(error),
         };
-        this.finishEvent(id, 'failed', failure.code);
+        this.finishEvent(id, 'failed', failure.code, failure.message);
         await this.jobs
           .update(id, {
             status: 'failed',

@@ -61,6 +61,24 @@ describe('emitRenderEvent', () => {
     expect(lines[0]).not.toContain('null');
   });
 
+  it('logs the fallback job and unavailable families at WARN', () => {
+    const logger = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    emitRenderEvent({
+      event: 'render_font_fallback',
+      jobId: 'job-font',
+      fontFallbackCount: 2,
+      fontFallbackFamilies: ['LXGW WenKai', 'MissingFace'],
+    });
+    expect(logger).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(String(logger.mock.calls[0]?.[0]))).toMatchObject({
+      level: 'WARN',
+      event: 'render_font_fallback',
+      jobId: 'job-font',
+      fontFallbackCount: 2,
+      fontFallbackFamilies: ['LXGW WenKai', 'MissingFace'],
+    });
+  });
+
   it('reports a failed render at ERROR on stderr so stderr-only pipelines see it', () => {
     const { lines } = captureStdout();
     const errors: string[] = [];
@@ -83,6 +101,35 @@ describe('emitRenderEvent', () => {
       outcome: 'failed',
       errorCode: 'execution_failed',
     });
+  });
+
+  it('serializes only a sanitized failure reason on failed render events', () => {
+    const errors: string[] = [];
+    vi.spyOn(console, 'error').mockImplementation((line: unknown) => errors.push(String(line)));
+    emitRenderEvent({
+      event: 'render_job_finished',
+      jobId: 'failed-job',
+      outcome: 'failed',
+      errorCode: 'execution_failed',
+      failureReason:
+        'ENOENT: no such file or directory, open /tmp/private/course.html\nat https://cdn.example.com/a?token=Secret',
+    });
+    expect(errors).toHaveLength(1);
+    expect(JSON.parse(errors[0]!)).toMatchObject({
+      level: 'ERROR',
+      event: 'render_job_finished',
+      jobId: 'failed-job',
+      errorCode: 'execution_failed',
+      failureReason: 'ENOENT: no such file or directory, open [path] at [url]',
+    });
+    expect(errors[0]).not.toContain('private');
+    expect(errors[0]).not.toContain('Secret');
+  });
+
+  it.each(['succeeded', 'cancelled'] as const)('omits failure reasons for %s jobs', (outcome) => {
+    const { lines } = captureStdout();
+    emitRenderEvent({ event: 'render_job_finished', outcome, failureReason: 'ENOMEM' });
+    expect(JSON.parse(lines[0]!)).not.toHaveProperty('failureReason');
   });
 
   it('keeps a cancelled render at INFO — it is an outcome, not a fault', () => {
@@ -140,6 +187,17 @@ describe('emitRenderEvent', () => {
     emitRenderEvent({ event: 'preview_request', route: '/preview', status: 400, durationMs: 3 });
 
     expect(JSON.parse(lines[0]!)).toMatchObject({ level: 'INFO', status: 400 });
+  });
+
+  it('serializes the runtime check result on the preview event', () => {
+    const { lines } = captureStdout();
+    emitRenderEvent({
+      event: 'preview_request',
+      route: '/interactive-runtime-check',
+      status: 429,
+      runtimeCheckResult: 'busy_timeout',
+    });
+    expect(JSON.parse(lines[0]!)).toMatchObject({ runtimeCheckResult: 'busy_timeout' });
   });
 });
 
