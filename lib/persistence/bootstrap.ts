@@ -74,6 +74,9 @@ export function getPersistenceLearnerKey(): Promise<string> {
  * branch; it constructs its own stores.
  */
 if (typeof window !== 'undefined') {
+  window.addEventListener?.('auth-change', () => {
+    learnerKeyPromise = undefined;
+  });
   const httpRuntimeStore = () => new HttpRuntimeStore({ baseUrl: '/api/persistence' });
   const browserRuntimeStore = new BrowserRuntimeStore();
   const memoryRuntimeStore = new MemoryRuntimeStore();
